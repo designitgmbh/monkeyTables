@@ -46,10 +46,10 @@ return response()->json($mTable->render(
 After including all dependencies, you just need to add a div, which will hold the table, and a small javascript snippet.
 
 ```HTML
-<div id="otable"></div>
+<div id="mtable"></div>
 
 <script>
-	var frame = new mTableFrameStd("#otable", {});
+	var frame = new mTableFrameStd("#mtable", {});
 	var table = new mTableStd({
 		frame: frame,
 		url: "/oTableBackend/project/indexList"
