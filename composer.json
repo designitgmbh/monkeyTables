@@ -1,0 +1,41 @@
+{
+    "name": "designitgmbh/monkeyTables",
+    "description": "monkeyTables is a simple package, to allow you to create powerful tables",
+    "keywords": [
+        "designitgmbh",
+        "monkeyTables"
+    ],
+    "homepage": "https://github.com/designitgmbh/monkeyTables",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Philipp Pajak",
+            "email": "p.pajak@design-it.de",
+            "homepage": "http://www.design-it.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=5.3.0",
+        "designitgmbh/monkeyAccess",
+        "designitgmbh/monkeySettings"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Designitgmbh\\MonkeyTables\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+        }
+    },
+    "scripts": {
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
