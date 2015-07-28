@@ -3,7 +3,6 @@
 
 	use Designitgmbh\MonkeyTables\Data\oDataChain;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
-	use WFormat;
 
 	/**
 	 * Basic class that represents a column of a table
@@ -159,7 +158,14 @@
 			if(isset($this->type)) {
 				switch($this->type) {
 					case("date"):
-						$value = date(Config::get('formats.displayDate.php'),strtotime($value));
+						if($value != intval($value))
+							$value = strtotime($value);
+
+						if($value)
+							$value = date(config('monkeyTables.date.displayDate.php'), $value);
+						else
+							$value = "";
+
 						break;
 					case("datetime"):
 						$value = date("d.m.Y H:i",strtotime($value));
