@@ -1,6 +1,11 @@
 <?php
 	namespace Designitgmbh\MonkeyTables\Report;
 
+	use Designitgmbh\MonkeyTables\Data\oDataPresetHandler;
+
+	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
+
 	/**
 	 * The main class for a report. A report contains a title, subtitle and the series.
 	 *
@@ -88,6 +93,11 @@
 				return $this;
 			}
 
+		public function addFilters($filters) {
+			$this->filters = $filters;
+		}
+
+
 		//getters
 
 		//private functions
@@ -116,9 +126,9 @@
 	 		$this->hiddenColumns		= $hiddenColumns;
 
 			if(isset($this->request['preset'])) {
-	 			$this->presetHandler = new \oTools\oData\oDataPresetHandler($this->name, $this->request['preset']);
+	 			$this->presetHandler = new oDataPresetHandler($this->name, $this->request['preset']);
 	 		} else {
-	 			$this->presetHandler = new \oTools\oData\oDataPresetHandler($this->name);
+	 			$this->presetHandler = new oDataPresetHandler($this->name);
 	 		}
 
 	 		$this->handlePreset();
@@ -174,7 +184,7 @@
 				$this->activePresetId 	= $preset->getId();
 
 				if($preset->isGeneral())
-					$this->presetCanModify = \oDataFrameworkHelperController::canModifyGeneralPresets();
+					$this->presetCanModify = oDataFrameworkHelperController::canModifyGeneralPresets();
 				else
 					$this->presetCanModify = true;
 
@@ -217,12 +227,19 @@
  		 *
 		 * @return array
 		 */
-		public function render($helperController, $DBController) {
+		public function render() {
+			$this->DBController 	= new oTablesFrameworkDBController;
+			$this->helpController 	= new oTablesFrameworkHelperController;
+
 			$output 		= [];
 			$renderedSeries = [];
 
 			foreach($this->series as $series) {
-				$renderedSeries[] = $series->render($helperController, $DBController);
+				foreach($this->filters as $filter) {
+					$series->addFilter($filter[0], $filter[1]);
+				}
+
+				$renderedSeries[] = $series->render($this->helpController, $this->DBController);
 			}
 
 			$output["header"] = [

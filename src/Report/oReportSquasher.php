@@ -161,7 +161,10 @@
 			}
 
 			foreach($xValues as $key => $date) {
-				$dateFormated = date($format, strtotime($date));
+				if($date != intval($date))
+					$date = strtotime($date);
+
+				$dateFormated = date($format, $date);
 
 				if(isset($dates[$dateFormated]))
 					$dates[$dateFormated]->addObject($xObjs[$key]);

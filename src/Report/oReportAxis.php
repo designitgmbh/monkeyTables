@@ -3,6 +3,8 @@
 
 	use Designitgmbh\MonkeyTables\Data\oDataChain;
 
+	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+
 	/**
 	 * An axis for a series. It contains the label and the valueKey (link to value key.. -> The valueKey is the column name of the entity or a eloquent valueKey... ).
 	 * You can also set the squashing function for the x-Axis.
@@ -79,6 +81,6 @@
 		 */
 		public function render($obj) {
 			//return value
-			return \oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->valueKey);
+			return oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->valueKey);
 		}
 	}

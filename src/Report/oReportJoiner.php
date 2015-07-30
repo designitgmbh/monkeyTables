@@ -21,6 +21,11 @@
 		public static function join(&$dataSet, $yAxis, $joinMethod) {
 			//foreach dataSetEntry
 			foreach($dataSet as $entry) {
+				if($joinMethod instanceof \Closure) {
+					$joinMethod($entry, $yAxis);
+					continue;
+				}
+
 				switch($joinMethod) {
 					case("COUNT"):
 						self::joinCount($entry, $yAxis);

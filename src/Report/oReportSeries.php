@@ -110,7 +110,7 @@
 		public function addFilter($label, $valueKey, $type = null) {
 			$hash = md5( $label . $valueKey . $type . $this->getSource() );
 
-			$this->filters[$hash] = (new \oTools\oReport\oReportFilter($label, $valueKey, $type))
+			$this->filters[$hash] = (new oReportFilter($label, $valueKey, $type))
 				->setChainNumber($hash);
 			
 			return $this;
