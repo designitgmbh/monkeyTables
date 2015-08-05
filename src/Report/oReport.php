@@ -4,6 +4,7 @@
 	use Designitgmbh\MonkeyTables\Data\oDataPresetHandler;
 
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
 
 	/**
