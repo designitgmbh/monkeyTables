@@ -251,6 +251,7 @@
 					"modified" => $this->presetIsModified,
 					"canModify" => $this->presetCanModify,
 					"isDefault" => $this->presetHandler->isDefaultPresetActive(),
+					"isGeneralDefault" => $this->presetHandler->isGeneralDefaultPresetActive(),
 					"isGeneral" => $this->presetHandler->isGeneral()
 				],
 				"presetList" => $this->presetList,
