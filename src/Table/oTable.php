@@ -420,6 +420,7 @@
 				"PRESETISMODIFIED" => $this->presetIsModified,
 				"PRESETCANMODIFY" => $this->presetCanModify,
 				"PRESETDEFAULTACTIVE" => $this->presetHandler->isDefaultPresetActive(),
+				"PRESETGENERALDEFAULTACTIVE" => $this->presetHandler->isGeneralDefaultPresetActive(),
 				"PRESETLIST" => $this->presetList
 			);
 

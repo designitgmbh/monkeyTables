@@ -46,6 +46,7 @@
 			$this->preset = null;
 			$this->presetList = null;
 			$this->isGeneral = null;
+			$this->defaultPresetWasLoaded = false;
 
 			if($request != null) {
 				$isGeneral 		 = $this->parseRequestVar($request, 'isGeneral');
@@ -79,6 +80,12 @@
 					break;
 				case "unsetDefault":
 					$this->unsetDefault();
+					break;
+				case "setAsGeneralDefault":
+					$this->setPresetAsGeneralDefault();
+					break;
+				case "unsetGeneralDefault":
+					$this->unsetGeneralDefault();
 					break;
 				case "rename":
 					$this->renamePreset($newPresetName);
@@ -116,17 +123,31 @@
 
 		public function isDefaultPresetActive() {
 			if($this->preset) {
-				$this->switchContext(false);
-				$index = $this->getPresetListIndexForId('default');
-				if($index == null)
-					return false;
-
-				$defaultId = $this->presetList[$index]['defaultId'];
-				$this->restoreContext();
-
-				return ($defaultId == $this->preset->getId());
+				return 
+					$this->isDefaultPresetActiveForContext(false);
 			}
 			return false;
+		}
+
+		public function isGeneralDefaultPresetActive() {
+			if($this->preset) {
+				return $this->isDefaultPresetActiveForContext(true);	
+			}
+			return false;
+		}
+
+		private function isDefaultPresetActiveForContext($context) {
+			$this->switchContext($context);
+			$index = $this->getPresetListIndexForId('default');
+			if($index == null) {
+				$this->restoreContext();
+				return false;
+			}
+
+			$defaultId = $this->presetList[$index]['defaultId'];
+			$this->restoreContext();
+
+			return ($defaultId == $this->preset->getId());
 		}
 
 		public function getPreset() {
@@ -146,12 +167,10 @@
 			foreach($presetList as $key => $preset)
 				if($preset['id'] == 'default') {
 					unset($presetList[$key]);
-					break;
 				}
 
 			return $presetList;
 		}
-
 
 
 		public function loadPresetSetting($setting) {
@@ -212,7 +231,20 @@
 		}
 
 		private function getDefaultPreset() {
-			$this->switchContext(false);
+			$preset = $this->getSavedDefaultPresetForContext(false);
+			if($preset === null) {
+				$preset = $this->getSavedDefaultPresetForContext(true);
+			}
+
+			if($preset === null) {
+				$preset = new oDataPreset('default', 'default');
+			}
+
+			return $preset;
+		}
+
+		private function getSavedDefaultPresetForContext($context = false) {
+			$this->switchContext($context);
 
 			foreach($this->presetList as $preset) {
 				if($preset['id'] == 'default') {
@@ -224,7 +256,8 @@
 				}
 			}
 
-			return new oDataPreset('default', 'default');
+			$this->restoreContext();
+			return null;
 		}
 
 		private function addNewPreset($newName, $newId = null) {
@@ -247,12 +280,20 @@
 			$this->setDefault($this->preset);
 		}
 
+		private function setPresetAsGeneralDefault() {
+			$this->setDefault($this->preset, true);
+		}
+
 		private function unsetDefault() {
 			$this->setDefault();
 		}
 
-		private function setDefault($preset = null) {
-			$this->switchContext(false);
+		private function unsetGeneralDefault() {
+			$this->setDefault(null, true);
+		}
+
+		private function setDefault($preset = null, $context = false) {
+			$this->switchContext($context);
 
 			$index = $this->getPresetListIndexForId('default');
 			if($index === null) {
