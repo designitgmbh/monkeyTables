@@ -261,6 +261,10 @@
 				$cell["CLASS"] .= $this->centerClass . " ";
 			}
 
+			if($this->type == "timeline") {
+				$cell["TIMELINE"] = true;
+			}
+
 			return $cell;
 		}
 
@@ -314,6 +318,14 @@
 				$cell["EDITABLE"] = $this->frameworkHelper->getRoute($this->editableRoute, $arguments);
 				$cell["EDITABLEATTRIBUTE"] = $this->editableAttribute;
 				$cell["EDITABLETYPE"] = $this->type;
+			}
+
+			if($this->type == "timeline") {
+				$cell["TIMELINE"] = true;
+
+				if($this->typeOptions) {
+					$cell["TIMELINE"] = $this->typeOptions;
+				}
 			}
 
 			//centered?
