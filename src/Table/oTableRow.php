@@ -1,6 +1,8 @@
 <?php
 	namespace Designitgmbh\MonkeyTables\Table;
 
+	use Designitgmbh\MonkeyTables\Writer\SylkWriter;
+
 	/**
 	 *  Row renderer
 	 * 		this does NOT represent one specific row, it just contains row specific functions
@@ -11,7 +13,9 @@
 	 */
 	class oTableRow
 	{
-		protected $columns;
+		protected 
+			$columns,
+			$writer = null;
 
 		public function __construct($columns) {
 			$this->columns = $columns;
@@ -36,7 +40,6 @@
 		}
 
 		public function renderCSVRow($obj, $options = null, $dl = ";", $nl = "\n") {
-			$row = $this->generateDefaultRow($options);
 			$csv = "";
 
 			foreach ($this->columns as $column) {
@@ -46,6 +49,34 @@
 			$csv .= $nl;
 
 			return $csv;
+		}
+
+		public function renderSYLKHeader($options = null) {
+			$this->writer = new SylkWriter();
+
+			$formats = [];
+			$header = [];
+			foreach($this->columns as $column) {
+				$formats[] = $column->getType();
+				$header[] = $column->getHeaderData();
+			}
+
+			$this->writer->defineFormatting($formats);
+			$this->writer->addRow($header);
+		}
+
+		public function renderSYLKRow($obj, $options = null) {
+			$row = [];
+
+			foreach($this->columns as $column) {
+				$row[] = $column->getData($obj, true);
+			}
+			
+			$this->writer->addRow($row);
+		}
+
+		public function renderSYLK() {
+			return $this->writer->render();
 		}
 
 		public function renderHeader($options) {

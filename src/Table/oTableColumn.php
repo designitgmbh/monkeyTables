@@ -4,6 +4,8 @@
 	use Designitgmbh\MonkeyTables\Data\oDataChain;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
 
+	use Designitgmbh\MonkeyTables\Format\Currency;
+
 	/**
 	 * Basic class that represents a column of a table
 	 *
@@ -209,7 +211,7 @@
 						break;
 					case("currency"):
 						$value = (is_null($value) ? 0 : $value);
-						$value = WFormat::currency($value);
+						$value = Currency::format($value);
 						break;
 					default:
 						break;
