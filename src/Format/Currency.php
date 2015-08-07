@@ -26,8 +26,8 @@
 		 * @param string $number - number to be formatted
 		 * @return string - currency string interpretation of double value passed as parameter
 		 */
-		public static function format($number, $decimals = 2, $dec_point = ",", $thousands_sep = ".") {
-			
+		public static function format($number, $decimals = 2, $dec_point = ",", $thousands_sep = ".") 
+		{	
 			return self::decimal($number, $decimals, $dec_point, $thousands_sep);
 		}
 	}
