@@ -109,8 +109,6 @@
 
 	 			//columnArrangement[0]=1&columnArrangement[1]=2&columnArrangement[2]=0&columnArrangement[3]=7&columnArrangement[4]=6&columnArrangement[5]=5&columnArrangement[6]=4&columnArrangement[7]=3
 
-	 		
-
 	 		//export type
 	 		$this->exportType = isset($this->request['exportType']) ? $this->request['exportType'] : null;
 	 		$this->exportFilename = isset($this->request['exportFilename']) ? $this->request['exportFilename'] : null;
@@ -433,6 +431,29 @@
 			);
 		}
 
+		private function exportAsSYLK($exportOptions = array()) {
+			$this->rowController->renderSYLKHeader();
+			foreach($this->dataSet as $obj)
+				$this->rowController->renderSYLKRow($obj);
+
+			$sylkFileContent = $this->rowController->renderSYLK();
+
+			if(isset($this->exportFilename))
+				$filename = $this->exportFilename;
+			else
+				$filename = "export";
+
+			header('Content-Description: File Transfer');
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment; filename='.$filename.'.slk');
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Pragma: public');
+			echo utf8_encode($sylkFileContent);
+			die("");
+		}
+
 		private function exportAsCSV($exportOptions = array()) {
 			$options = array("A" => null);
 
@@ -491,6 +512,8 @@
 			$this->rowController = new $this->oTableRowClassName($this->columns);
 
 			switch($this->exportType) {
+				case("sylk"):
+					return $this->exportAsSYLK();
 				case("csv"):
 					return $this->exportAsCSV();
 				default:
