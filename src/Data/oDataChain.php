@@ -1,5 +1,7 @@
 <?php
 	namespace Designitgmbh\MonkeyTables\Data;
+	
+	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
 
 	/**
 	 * An abstract class that represents a data chain inside of a data set. 
@@ -168,14 +170,14 @@
 			switch($this->type) {
 				case("bool"):
 					$this->filterValues = array(
-												"true"	=>	\oTablesFrameworkHelperController::translate('labels.yes'),
-												"false"	=>	\oTablesFrameworkHelperController::translate('labels.no')
+												"true"	=>	oDataFrameworkHelperController::translate('labels.yes'),
+												"false"	=>	oDataFrameworkHelperController::translate('labels.no')
 											);
 					break;
 				case("exists"):
 					$this->filterValues = array(
-												"true"	=>	\oTablesFrameworkHelperController::translate('labels.yes'),
-												"false"	=>	\oTablesFrameworkHelperController::translate('labels.no')
+												"true"	=>	oDataFrameworkHelperController::translate('labels.yes'),
+												"false"	=>	oDataFrameworkHelperController::translate('labels.no')
 											);
 					break;
 				default:
