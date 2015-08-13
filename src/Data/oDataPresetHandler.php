@@ -1,8 +1,7 @@
 <?php
 	namespace Designitgmbh\MonkeyTables\Data;
-
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
+	
+	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
 
 	/**
 	 * A basic class that handles an oDataPreset for a dataset
@@ -197,7 +196,7 @@
 			else
 				$function = "getSystemUserSetting";
 
-			return json_decode(oTablesFrameworkHelperController::$function($name),true);
+			return json_decode(oDataFrameworkHelperController::$function($name),true);
 		}
 		private function saveSetting($setting, $content) {
 			$name = 'oDP-'.$this->oDataId.'_'.$setting;
@@ -208,7 +207,7 @@
 			else
 				$function = "setSystemUserSetting";
 
-			oTablesFrameworkHelperController::$function($name, $encodedContent);
+			oDataFrameworkHelperController::$function($name, $encodedContent);
 
 			return $this;
 		}

@@ -5,7 +5,6 @@
 
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
 
 	/**
 	 * The main class for a report. A report contains a title, subtitle and the series.
@@ -230,7 +229,7 @@
 		 */
 		public function render() {
 			$this->DBController 	= new oTablesFrameworkDBController;
-			$this->helpController 	= new oTablesFrameworkHelperController;
+			$this->helpController 	= new oDataFrameworkHelperController;
 
 			$output 		= [];
 			$renderedSeries = [];

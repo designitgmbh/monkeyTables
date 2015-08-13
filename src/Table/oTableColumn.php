@@ -170,10 +170,24 @@
 
 						break;
 					case("datetime"):
-						$value = date("d.m.Y H:i",strtotime($value));
+						if($value != intval($value))
+							$value = strtotime($value);
+
+						if($value)
+							$value = date("d.m.Y H:i", $value);
+						else
+							$value = "";
+
 						break;
 					case("time"):
-						$value = date("H:i",strtotime($value));
+						if($value != intval($value))
+							$value = strtotime($value);
+
+						if($value)
+							$value = date("H:i", $value);
+						else
+							$value = "";
+
 						break;
 					case("decimal"):
 						$value = number_format($value, 2, ",", ".");
@@ -207,7 +221,7 @@
 						$value = implode(", ", $value);
 						break;
 					case("nullableValue"):
-						$value = (is_null($value) ? Lang::get('labels.none') : $value);
+						$value = (is_null($value) ? oDataFrameworkHelperController::translate('labels.none') : $value);
 						break;
 					case("currency"):
 						$value = (is_null($value) ? 0 : $value);

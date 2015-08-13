@@ -1,6 +1,8 @@
 <?php
 	namespace Designitgmbh\MonkeyTables\Report;
 
+	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
+
 	/**
 	 * A static class containing all the squashing methods that can be used in the reports.
 	 * 
@@ -141,11 +143,11 @@
 				switch($format) {
 					case("m"):
 						//month only
-						$xValue = \oTablesFrameworkHelperController::translate("labels.month".$dateFormated);
+						$xValue = oDataFrameworkHelperController::translate("labels.month".$dateFormated);
 						break;
 					case("N"):
 						//weekday only
-						$xValue = \oTablesFrameworkHelperController::translate("labels.weekday".$dateFormated);
+						$xValue = oDataFrameworkHelperController::translate("labels.weekday".$dateFormated);
 						break;
 					default:
 						$xValue = $dateFormated;
