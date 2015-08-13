@@ -42,7 +42,7 @@ class oDataFrameworkHelperController extends Controller
 
 	public static function translate($string)
 	{
-		return Lang::get($string);
+		return trans($string);
 	}
 
 	public function getRoute($route, $arguments)
