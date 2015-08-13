@@ -205,7 +205,9 @@ class oTablesFrameworkDBController
 				$value 		= $filter['value'];
 
 				$values 	= json_decode($value, true);
-				if ($values === null && json_last_error() !== JSON_ERROR_NONE) {
+
+				if (($values === null && json_last_error() !== JSON_ERROR_NONE) ||
+					($value === "true" || $value === "false" || $value === "null")) {
 					//value is not json formatted, so take its original value
 					$values = [$value];
 				}
