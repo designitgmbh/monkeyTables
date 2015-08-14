@@ -208,6 +208,13 @@ class oTablesFrameworkDBController
 
 				if (($values === null && json_last_error() !== JSON_ERROR_NONE) ||
 					($value === "true" || $value === "false" || $value === "null")) {
+					if($value === "true")
+						$value = true;
+					if($value === "false")
+						$value = false;
+					if($value === "null")
+						$value = null;
+					
 					//value is not json formatted, so take its original value
 					$values = [$value];
 				}
