@@ -10,10 +10,17 @@ class oTablesFrameworkDBController
 	protected $modelNamespace = "App\\Models\\";
 
 	private $DBColumns;
+	private $selectClauses;
 
 	public static function recursiveObjectGetter($obj, $string) {
 		if(!$string)
 			return null;
+
+		//check if is SQL Command
+		if(strpos($string,",") && strpos($string,"(") && strpos($string,")")) {
+			$name = md5($string);
+			return $obj->$name;
+		}
 		
 		//check for recursion
 		if(strpos($string, "->") === false && strpos($string, "()") === false) {
@@ -196,6 +203,10 @@ class oTablesFrameworkDBController
 				if(!$DBColumn->isFetchable())
 					continue;
 
+				if($DBColumn->needsSelect()) {
+					$this->selectClauses[] = $DBColumn->getSelectClause();
+				}
+
 				if($DBColumn->needsJoin()) {
 					$this->joinTable($collection, $DBColumn);
 				}
@@ -282,6 +293,10 @@ class oTablesFrameworkDBController
 				if(!$DBColumn->isFetchable())
 					continue;
 
+				if($DBColumn->needsSelect()) {
+					$this->selectClauses[] = $DBColumn->getSelectClause();
+				}
+
 				if($DBColumn->needsJoin()) {
 					$this->joinTable($collection, $DBColumn);
 				}
@@ -313,6 +328,10 @@ class oTablesFrameworkDBController
 			$DBColumn = $this->getDBColumnByValueKey($filters['sorting']['valueKey']);
 
 			if($DBColumn->isFetchable()) {
+				if($DBColumn->needsSelect()) {
+					$this->selectClauses[] = $DBColumn->getSelectClause();
+				}
+
 				if($DBColumn->needsJoin()) {
 					$this->joinTable($collection, $DBColumn);
 				}
@@ -322,7 +341,8 @@ class oTablesFrameworkDBController
 		}
 
 		/* SELECT */
-		$collection = $collection->select($model->getTable().".*");
+		$this->selectClauses[] = $model->getTable().".*";
+		$collection = $collection->select($this->selectClauses);
 
 		/* GROUP */
 		if(!$this->groupBy) {
@@ -428,6 +448,9 @@ class oTablesFrameworkDBControllerColumn {
 		$this->fieldName 		= null;
 		$this->tableRealName 	= null;
 		$this->tableAliasName 	= null;
+
+		$this->needsSelect 		= false;
+		$this->selectClause 	= "";
 		
 		$this->needsJoin 		= false;
 		$this->joins 			= array();
@@ -465,6 +488,14 @@ class oTablesFrameworkDBControllerColumn {
 
 	public function needsJoin() {
 		return $this->needsJoin;
+	}
+
+	public function needsSelect() {
+		return $this->needsSelect;
+	}
+
+	public function getSelectClause() {
+		return DB::raw($this->selectClause);
 	}
 
 	public function getJoinArrayKeys() {
@@ -523,6 +554,7 @@ class oTablesFrameworkDBControllerColumn {
 	}
 
 	private function evalFieldName() {
+		//Check if is Model Function
 		if( strpos($this->valueKey,"()") ) {
 			$this->isFetchable = false;
 			return false;
@@ -530,6 +562,17 @@ class oTablesFrameworkDBControllerColumn {
 
 		$this->isFetchable = true;
 
+		//Check if is SQL Command
+		if(strpos($this->valueKey,",") && strpos($this->valueKey,"(") && strpos($this->valueKey,")")) {
+			$this->needsSelect = true;
+			$this->fieldRealName = false;
+			$this->fieldName = DB::raw($this->valueKey);
+			$this->selectClause = $this->valueKey . " AS " . md5($this->fieldName);
+
+			return true;
+		}
+
+		//Check if is Relation
 		if( strpos($this->valueKey,"->") ) {
 			//join
 			$this->needsJoin = true;
