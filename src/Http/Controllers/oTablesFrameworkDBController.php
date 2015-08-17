@@ -203,10 +203,6 @@ class oTablesFrameworkDBController
 				if(!$DBColumn->isFetchable())
 					continue;
 
-				if($DBColumn->needsSelect()) {
-					$this->selectClauses[] = $DBColumn->getSelectClause();
-				}
-
 				if($DBColumn->needsJoin()) {
 					$this->joinTable($collection, $DBColumn);
 				}
@@ -293,10 +289,6 @@ class oTablesFrameworkDBController
 				if(!$DBColumn->isFetchable())
 					continue;
 
-				if($DBColumn->needsSelect()) {
-					$this->selectClauses[] = $DBColumn->getSelectClause();
-				}
-
 				if($DBColumn->needsJoin()) {
 					$this->joinTable($collection, $DBColumn);
 				}
@@ -328,9 +320,6 @@ class oTablesFrameworkDBController
 			$DBColumn = $this->getDBColumnByValueKey($filters['sorting']['valueKey']);
 
 			if($DBColumn->isFetchable()) {
-				if($DBColumn->needsSelect()) {
-					$this->selectClauses[] = $DBColumn->getSelectClause();
-				}
 
 				if($DBColumn->needsJoin()) {
 					$this->joinTable($collection, $DBColumn);
@@ -341,6 +330,19 @@ class oTablesFrameworkDBController
 		}
 
 		/* SELECT */
+		if(isset($filters['select'])) {
+			foreach($filters['select'] as $filter) {
+				$DBColumn = $this->getDBColumnByValueKey($filter['valueKey']);
+
+				if(!$DBColumn->isFetchable())
+					continue;
+
+				if($DBColumn->needsSelect()) {
+					$this->selectClauses[] = $DBColumn->getSelectClause();
+				}
+			}
+		}
+
 		$this->selectClauses[] = $model->getTable().".*";
 		$collection = $collection->select($this->selectClauses);
 

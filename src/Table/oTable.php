@@ -227,6 +227,7 @@
 			$filters = [];
 
 			$this
+				->createSelectFilters($filters)
 				->createPaginationFilters($filters)
 				->createSortingFilters($filters)
 				->createFilteringFilters($filters)
@@ -291,12 +292,33 @@
 						continue;
 
 					$quickSearchArray[] = [
-						"valueKey" 	=> $column->getValueKey(),
+						"valueKey" 	=> $valueKey,
 						"value"		=> $this->quickSearchString
 					];
 				}
 				$filters['quickSearch'] = $quickSearchArray;
 			}
+
+			return $this;
+		}
+
+		protected function createSelectFilters(&$filters) {
+			$selectArray = [];
+
+			foreach($this->columns as $column) {
+				if(!$column->isEnabled())
+					continue;
+
+				$valueKey = $column->getValueKey();
+				if(!$valueKey)
+					continue;
+
+				$selectArray[] = [
+					"valueKey" => $valueKey
+				];
+			}
+
+			$filters['select'] = $selectArray;
 
 			return $this;
 		}
