@@ -34,6 +34,7 @@
 			$this->class 			= null;
 			$this->filters 			= array();
 			$this->centerClass 		= null;
+			$this->linkExtraData	= null;
 		}
 
 		// getter functions //
@@ -44,10 +45,11 @@
 
 		// setter functions //
 
-		public function setClickable($href, $valueKey, $callback = null) {
+		public function setClickable($href, $valueKey, $callback = null, $extraData=null) {
 			$this->href = $href;
 			$this->linkValueKey = $valueKey;
 			$this->linkValueCallback = $callback;
+			$this->linkExtraData = $extraData;
 
 			return $this;
 		}
@@ -126,7 +128,7 @@
 		private function getCellLink($obj) {
 			if(is_string($this->href) && !empty($this->href)) {
 				if (is_string($this->linkValueKey) && !empty($this->linkValueKey)) {
-					$value = oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->linkValueKey);
+					$value = oTablesFrameworkDBController::recursiveOPbjectGetter($obj, $this->linkValueKey);
 					if (is_callable($this->linkValueCallback)) {
 						$value = call_user_func($this->linkValueCallback, $value, $obj);
 						if (is_null($value)) {
@@ -135,7 +137,15 @@
 							return $value;
 						}
 					} else {
-						return str_replace("{{ID}}", $value, $this->href);
+						$auxHref=$this->href;
+						//to format the link for some extra variable and not just the id
+						if($this->linkExtraData && is_array($this->linkExtraData)){
+							foreach($this->linkExtraData as $data){
+								$val = oTablesFrameworkDBController::recursiveObjectGetter($obj, $data);
+								$auxHref = str_replace("{{". $data ."}}", $val, $auxHref);
+							}
+						}
+						return str_replace("{{ID}}", $value, $auxHref);
 					}
 				} else {
 					return $this->href;
