@@ -128,7 +128,7 @@
 		private function getCellLink($obj) {
 			if(is_string($this->href) && !empty($this->href)) {
 				if (is_string($this->linkValueKey) && !empty($this->linkValueKey)) {
-					$value = oTablesFrameworkDBController::recursiveOPbjectGetter($obj, $this->linkValueKey);
+					$value = oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->linkValueKey);
 					if (is_callable($this->linkValueCallback)) {
 						$value = call_user_func($this->linkValueCallback, $value, $obj);
 						if (is_null($value)) {
