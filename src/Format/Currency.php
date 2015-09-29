@@ -18,7 +18,7 @@
 		 */
 		public static function decimal($number, $decimals = 2, $dec_point = ",", $thousands_sep = ".")
 		{
-			return number_format($number, $decimals, $dec_point, $thousands_sep);
+			return number_format(floatval($number), $decimals, $dec_point, $thousands_sep);
 		}
 
 		/**
