@@ -17,8 +17,8 @@ class oTablesFrameworkDBController
 			return null;
 
 		//check if is SQL Command
-		if(strpos($string,",") && strpos($string,"(") && strpos($string,")")) {
-			$name = md5($string);
+		if(oTablesFrameworkDBControllerColumn::isSQLCmd($string)) {
+			$name = "sql" . md5($string);
 			return $obj->$name;
 		}
 		
@@ -272,7 +272,10 @@ class oTablesFrameworkDBController
 								$function = $funcArr[$key];
 								$value = $valueArr[$key];
 
-								$subquery = $subquery->$function($fieldName, $compare, $value);
+								$subquery = $subquery->$function(
+									DB::raw("LOWER(" . $fieldName . ")"), 
+									$compare, 
+									DB::raw("LOWER('$value')"));
 							}
 						});						
 					}	
@@ -302,9 +305,13 @@ class oTablesFrameworkDBController
 
 					$DBColumn 	= $DBColumns[$key];
 					$compare 	= "LIKE";
-					$value 		= "%" . $filter['value'] . "%";
+					$value 		= "LOWER('%" . $filter['value'] . "%')";
 
-					$collection->orWhere($DBColumn->getFieldName(), $compare, $value);	
+					$collection->orWhere(
+						DB::raw('LOWER( ' . $DBColumn->getFieldName() . ')'),
+						$compare, 
+						DB::raw($value)
+					);
 				}	
 			});
 		}
@@ -466,6 +473,18 @@ class oTablesFrameworkDBControllerColumn {
 		$this->evalFieldName();
 	}
 
+	public static function isSQLCmd($valueKey) {
+		$hasParenthesis = strpos($valueKey,"(") 
+							&& strpos($valueKey,")");
+		$hasComma 		= strpos($valueKey,",");
+		$hasSQLCaseCmd 	= stripos($valueKey,"CASE") 
+							&& stripos($valueKey,"WHEN") 
+							&& stripos($valueKey,"THEN") 
+							&& stripos($valueKey,"END");
+
+		return($hasParenthesis && ($hasComma || $hasSQLCaseCmd));
+	}
+
 	public function isFetchable() {
 		return $this->isFetchable;
 	}
@@ -565,11 +584,11 @@ class oTablesFrameworkDBControllerColumn {
 		$this->isFetchable = true;
 
 		//Check if is SQL Command
-		if(strpos($this->valueKey,",") && strpos($this->valueKey,"(") && strpos($this->valueKey,")")) {
+		if(self::isSQLCmd($this->valueKey)) {
 			$this->needsSelect = true;
 			$this->fieldRealName = false;
 			$this->fieldName = DB::raw($this->valueKey);
-			$this->selectClause = $this->valueKey . " AS " . md5($this->fieldName);
+			$this->selectClause = $this->valueKey . " AS sql" . md5($this->fieldName);
 
 			return true;
 		}
@@ -679,6 +698,10 @@ class oTablesFrameworkDBControllerColumn {
 					$key2 = str_replace($table, $aliasName, $key2);
 				}
 			}
+
+			//the first key might need to use an alias name for its table
+			$key1Table = strstr($key1, ".", true);
+			$key1 = str_replace($key1Table, $this->getAliasForJoinedTable($key1Table), $key1);
 
 			//the second key might need to use an alias name for its table
 			$key2Table = strstr($key2, ".", true);

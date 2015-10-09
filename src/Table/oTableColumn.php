@@ -159,6 +159,16 @@
 			//type
 			if(isset($this->type)) {
 				switch($this->type) {
+					case("shortDate"):
+						if($value != intval($value))
+							$value = strtotime($value);
+
+						if($value)
+							$value = date(config('monkeyTables.date.displayDateShort.php'), $value);
+						else
+							$value = "";
+
+						break;
 					case("date"):
 						if($value != intval($value))
 							$value = strtotime($value);
@@ -190,7 +200,7 @@
 
 						break;
 					case("decimal"):
-						$value = number_format($value, 2, ",", ".");
+						$value = number_format((float)$value, 2, ",", ".");
 						break;
 					case("bool"):
 						$value = '<span class="glyphicon glyphicon-' . ($value ? 'ok' : 'remove') . '"></span>';
@@ -223,8 +233,12 @@
 					case("nullableValue"):
 						$value = (is_null($value) ? oDataFrameworkHelperController::translate('labels.none') : $value);
 						break;
+					case("string"):
+						if(empty($value))
+							$value = "-";
+						break;
 					case("currency"):
-						$value = (is_null($value) ? 0 : $value);
+						$value = (is_null($value) ? 0 : floatval($value));
 						$value = Currency::format($value);
 						break;
 					default:

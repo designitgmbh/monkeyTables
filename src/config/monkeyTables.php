@@ -17,6 +17,12 @@ return
 	        'php'   => 'd.m.Y'
 	    ],
 
+	    'displayDateShort' => 
+	    [
+	        'js'    => 'DD MM',
+	        'php'   => 'd m'
+	    ],
+
 	    'dbDate' =>
 	    [
 	        'js'    => 'YYYY-MM-DD',
