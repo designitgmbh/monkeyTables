@@ -268,14 +268,16 @@ class oTablesFrameworkDBController
 						}
 
 						$query = $query->orWhere(function($subquery) use($fieldName, $value, $compare, $compareArr, $funcArr, $valueArr) {
-							foreach($compareArr as $key => $compare) {
+							foreach($compareArr as $key => $compare)
+							{
 								$function = $funcArr[$key];
 								$value = $valueArr[$key];
 
 								$subquery = $subquery->$function(
 									DB::raw("LOWER(" . $fieldName . ")"), 
-									$compare, 
-									DB::raw("LOWER('$value')"));
+									$compare,
+									is_bool($value)? $value : DB::raw("LOWER('$value')")
+								);
 							}
 						});						
 					}	
