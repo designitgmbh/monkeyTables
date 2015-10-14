@@ -72,6 +72,7 @@ class oTablesFrameworkDBController
 		$this->mainTable = null;
 
 		$this->DBColumns = array();
+		$this->selectClauses = [];
 	}
 
 	public function getRowsCount() {
