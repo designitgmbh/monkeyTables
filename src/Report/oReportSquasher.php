@@ -123,14 +123,25 @@
 			}
 
 			$dates = [];
+			$formatFromMinDate = true;
+			$businessYear = false;
 
 			switch($limits) {
 				case(is_array($limits)):
 					$dateMin = new \DateTime($limits["from"]);
 					$dateMax = new \DateTime($limits["to"]);
-					break;
-				case("auto"):
 
+					if(isset($limits['formatFromMaxDate']) && $limits['formatFromMaxDate']) {
+						$formatFromMinDate = false;
+					}
+
+					if(isset($limits['businessYear']) && is_array($limits['businessYear'])) {
+						$businessYear = $limits['businessYear'];
+					}
+
+					break;
+
+				case("auto"):
 				default:
 					$dateMin = new \DateTime("-1 year january");
 					$dateMax = new \DateTime("december");
@@ -138,8 +149,14 @@
 			}
 
 			do {
-				$dateFormated = $dateMin->format($format);
+				if($formatFromMinDate)
+					$dateFormated = $dateMin->format($format);
 
+				$dateMin->add($dateInterval);
+
+				if(!$formatFromMinDate)
+					$dateFormated = $dateMin->format($format);
+				
 				switch($format) {
 					case("m"):
 						//month only
@@ -155,7 +172,6 @@
 				}
 
 				$dates[$dateFormated] = new oReportDataSetEntry($xValue);
-				$dateMin->add($dateInterval);
 			} while( $dateMin <= $dateMax );
 
 			if(strpos($format, ".") === false) {
@@ -166,7 +182,23 @@
 				if($date != intval($date))
 					$date = strtotime($date);
 
-				$dateFormated = date($format, $date);
+				$date = (new \DateTime())
+					->setTimestamp($date);
+
+				if($businessYear) {
+					$month = $date->format('m');
+					$businessYearStartMonth = date('m', strtotime($businessYear['start']));
+
+					if($formatFromMinDate) {
+						if ($month < $businessYearStartMonth)
+							$date->sub($dateInterval);
+					} else {
+						if ($month > $businessYearStartMonth)
+							$date->add($dateInterval);
+					}
+				}
+
+				$dateFormated = $date->format($format);
 
 				if(isset($dates[$dateFormated]))
 					$dates[$dateFormated]->addObject($xObjs[$key]);
