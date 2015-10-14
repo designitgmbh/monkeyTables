@@ -483,7 +483,7 @@ class oTablesFrameworkDBControllerColumn {
 	}
 
 	public static function isSQLCmd($valueKey) {
-		$hasParenthesis = strpos($valueKey,"(") 
+		$hasParenthesis = (strpos($valueKey,"(") !== false)
 							&& strpos($valueKey,")");
 		$hasComma 		= strpos($valueKey,",");
 		$hasSQLCaseCmd 	= stripos($valueKey,"CASE") 
