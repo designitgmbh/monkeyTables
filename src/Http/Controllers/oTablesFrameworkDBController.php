@@ -170,8 +170,15 @@ class oTablesFrameworkDBController
 						$realTableName . " AS " . $aliasTableName, 
 						function($join) use ($keysForJoin, $DBColumn, $aliasTableName, $key) {
 							$join
-								->on($keysForJoin[0], "=", $keysForJoin[1])
-								->where($aliasTableName . "." . $DBColumn->getWhereClauseField($key), "=", $DBColumn->getWhereClauseValue($key));
+								->on($keysForJoin[0], "=", $keysForJoin[1]);
+
+							foreach($DBColumn->getWhereClauses($key) as $whereClause) {
+								$field 		= $whereClause["field"];
+								$operator 	= $whereClause["operator"];
+								$value 		= $whereClause["value"];
+
+								$join->where($aliasTableName . "." . $field, $operator, $value);
+							}
 						});
 				} else {
 					$collection = $collection->leftJoin($realTableName . " AS " . $aliasTableName, $keysForJoin[0], "=", $keysForJoin[1]);
@@ -269,15 +276,16 @@ class oTablesFrameworkDBController
 						}
 
 						$query = $query->orWhere(function($subquery) use($fieldName, $value, $compare, $compareArr, $funcArr, $valueArr) {
-							foreach($compareArr as $key => $compare)
-							{
+							foreach($compareArr as $key => $compare) {
 								$function = $funcArr[$key];
 								$value = $valueArr[$key];
 
 								$subquery = $subquery->$function(
 									DB::raw("LOWER(" . $fieldName . ")"), 
-									$compare,
-									is_bool($value)? $value : DB::raw("LOWER('$value')")
+									$compare, 
+									is_string($value) ? 
+										DB::raw("LOWER('$value')") :
+										$value
 								);
 							}
 						});						
@@ -446,8 +454,7 @@ class oTablesFrameworkDBControllerColumn {
 	private $joins;
 	private $keysForJoin;
 	private $hasWhereClause;
-	private $whereClauseField;
-	private $whereClauseValue;
+	private $whereClauses;
 
 	private $isRelatedTable = null;
 
@@ -468,8 +475,7 @@ class oTablesFrameworkDBControllerColumn {
 		$this->joins 			= array();
 		$this->keysForJoin 		= null;
 		$this->hasWhereClause 	= false;
-		$this->whereClauseField = null;
-		$this->whereClauseValue = null;
+		$this->whereClauses = null;
 
 		$this->joinArray 		= [];
 
@@ -542,18 +548,11 @@ class oTablesFrameworkDBControllerColumn {
 		return $this->hasWhereClause;
 	}
 
-	public function getWhereClauseField($key = null) {
+	public function getWhereClauses($key = null) {
 		if($key !== null) {
-			return $this->joinArray[$key]["whereClauseField"];
+			return $this->joinArray[$key]["whereClauses"];
 		}
-		return $this->whereClauseField;
-	}
-
-	public function getWhereClauseValue($key = null) {
-		if($key !== null) {
-			return $this->joinArray[$key]["whereClauseValue"];
-		}
-		return $this->whereClauseValue;
+		return $this->whereClauses;
 	}
 
 	public function isRelatedTable() {
@@ -624,20 +623,36 @@ class oTablesFrameworkDBControllerColumn {
 
 		foreach($relations as $relationKey => $relationString) {
 			//set defaults
-			$hasWhereClause = false;
-			$whereClauseField = null;
-			$whereClauseValue = null;
+			$hasWhereClause 	= false;
+			$whereClauseAlias 	= "";
+			$whereClauses 		= [];
 
 			//extract where clause
 			if(strpos($relationString, "[") && $str = explode("[", $relationString)) {
 				$relationString 	= $str[0];
 				$str 				= explode("]", $str[1]);
 				$whereClause 		= $str[0];
-				$condition 			= explode("=", $whereClause);
 
-				$hasWhereClause 	= true;
-				$whereClauseField 	= $condition[0];
-				$whereClauseValue 	= $condition[1];
+				foreach(explode(",", $whereClause) as $clause) {
+					if(strpos($clause, "!=")) {
+						$operator 		= "!=";
+					} else {
+						$operator 		= "=";
+					}
+
+					$condition 			= explode($operator, $clause);
+
+					$hasWhereClause 	= true;
+
+					$clauseArray 		= [
+						"field" 	=> $condition[0],
+						"operator" 	=> $operator,
+						"value" 	=> $condition[1]
+					];
+
+					$whereClauses[] 	= $clauseArray;
+					$whereClauseAlias  .= join("", $clauseArray);
+				}
 			}
 
 			//set relation and keys
@@ -686,7 +701,7 @@ class oTablesFrameworkDBControllerColumn {
 
 			if($hasWhereClause) {
 				//need to create alias if it has a where clause, so we can sort etc.
-				$aliasName .= md5($whereClauseField . $whereClauseValue);
+				$aliasName .= md5($whereClauseAlias);
 
 				//replace table name in key
 				
@@ -716,17 +731,15 @@ class oTablesFrameworkDBControllerColumn {
 				"aliasTableName"	=> $aliasName,
 				"keysForJoin" 		=> array($key1, $key2),
 				"hasWhereClause" 	=> $hasWhereClause,
-				"whereClauseField" 	=> $whereClauseField,
-				"whereClauseValue" 	=> $whereClauseValue
+				"whereClauses" 		=> $whereClauses
 			);			
 		}
 
 		//for backwards compatibility and shall be faster for standard tables
 		$this->hasWhereClause = $hasWhereClause;
 		if($this->hasWhereClause) {
-			$this->whereClauseField = $whereClauseField;
-			$this->whereClauseValue = $whereClauseValue;	
-		}		
+			$this->whereClauses = $whereClauses;
+		}
 
 		$this->tableAliasName = $aliasName;
 		$this->tableRealName  = $table;
