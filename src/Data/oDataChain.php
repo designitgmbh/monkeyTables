@@ -163,6 +163,10 @@
 		public function hasAutoFilterValues() {
 			return (isset($this->hasAutoFilterValues) && $this->hasAutoFilterValues);
 		}
+
+		public function hasFilterValuesAlreadySet() {
+			return (is_array($this->filterValues) && !empty($this->filterValues));
+		}
 		
 
 		/* PRIVATE METHODS */

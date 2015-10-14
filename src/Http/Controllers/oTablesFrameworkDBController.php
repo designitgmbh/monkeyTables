@@ -108,7 +108,10 @@ class oTablesFrameworkDBController
 		$this->mainTable= $model->getTable();
 
 		foreach($columns as $key => $column) {
-			if(!$column->hasAutoFilterValues()) {
+			if($column->hasAutoFilterValues()) {
+				if($column->hasFilterValuesAlreadySet())
+					continue;
+			} else {
 				$column->setFilterValues([]);
 				continue;
 			}
