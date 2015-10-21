@@ -267,7 +267,7 @@
 						$column = $this->columns[$filter["column"]];
 						$filterArray[] = [
 							"valueKey" 	=> $column->getValueKey(),
-							"compare"  	=> $filter['compare'],
+							"compare"  	=> $filter['compare'] ? : '=',
 							"value"		=> $filter['value']
 						];
 
