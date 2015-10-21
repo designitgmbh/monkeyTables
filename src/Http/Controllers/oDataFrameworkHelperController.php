@@ -47,7 +47,7 @@ class oDataFrameworkHelperController extends Controller
 
 	public function getRoute($route, $arguments)
 	{
-		return URL::route($route, $arguments);
+		return route($route, $arguments, false);
 	}
 
 	public function sendMail() 
