@@ -9,6 +9,31 @@
 
 return 
 [
+	'export' => 
+	[
+		'cookie' => '_sid',
+		'printView' => 
+		[
+			'url' => '/monkeyTablesPrintView.php'
+		]
+	],
+
+	'service' => 
+	[
+		'html2pdf' => 'localhost:8088'
+	],
+
+	'businessPaper' =>
+	[
+		'paperSize' => 
+		[
+			'name' 	=> 'A4'
+		],
+		'orientation' => 'landscape',
+		'margin' => 1,
+		'units' => 'cm'
+	],
+
 	'date' =>
 	[
 		'displayDate' => 

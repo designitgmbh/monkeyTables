@@ -2,10 +2,14 @@
 
 namespace Designitgmbh\MonkeyTables\Http\Controllers;
 
+use Request;
+
 //use App\Models\UserSetting;
 //use App\Models\SystemSetting;
 use Designitgmbh\MonkeySettings\Models\UserSetting;
 use Designitgmbh\MonkeySettings\Models\SystemSetting;
+
+use Designitgmbh\MonkeyTables\Export\WExport;
 
 class oDataFrameworkHelperController extends Controller
 {
@@ -103,17 +107,50 @@ class oDataFrameworkHelperController extends Controller
 	public function exportPDF($JSONRequest = null, $returnResponse = true) 
 	{
 		//need to add slashes to JSON due to issues with slashes
-		$JSONRequest = $JSONRequest ?: Input::get('JSON');
-		$businessPaper = BusinessPaper::where('name', '=', 'Horizontal')->first();
-		return WExport::exportPDF(URL::route($this->_printViewRoute), $businessPaper, array('JSON' => $JSONRequest), $returnResponse);
+		$JSONRequest = $JSONRequest ?: Request::get('JSON');
+
+		$printViewUrl = config('monkeyTables.export.printView.url');
+		if($printViewUrl)
+		{
+			$printViewUrl = $this->generateFullUrl($printViewUrl);
+		}
+		else
+		{
+			$printViewUrl = route($this->_printViewRoute);
+		}
+
+		return WExport::exportPDF(
+			$printViewUrl,
+			array('JSON' => $JSONRequest), 
+			$returnResponse
+		);
 	}
 
 	public function printView() 
 	{
+		if($redirectUrl = config('monkeyTables.export.printView.redirect'))
+		{
+			return redirect($this->generateFullUrl($redirectUrl))
+				->withInput();
+		}
+
 		//need to add slashes to JSON due to issues with slashes
 		//probably because it is echoed into the blade view
-		$JSONRequest = addslashes(Input::get('JSON'));
+		$JSONRequest = addslashes(Request::get('JSON'));
 
-		return View::make($this->_printViewRoute, array('JSONRequest' => $JSONRequest));
+		return view($this->_printViewRoute, array('JSONRequest' => $JSONRequest));
+	}
+
+	private function generateFullUrl($url)
+	{
+		//we are "regenerating" the url, as otherwise lumen
+		//would just take the 'base url path' and add it
+		//although we want to get back to the root url
+		$request = app()->make('request');
+		
+		$root = $request->getSchemeAndHttpHost();
+		$tail = "";
+
+		return trim($root.'/'.trim($url.'/'.$tail, '/'), '/');
 	}
 }
