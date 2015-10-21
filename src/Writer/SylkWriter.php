@@ -159,7 +159,7 @@
 					}
 					else
 					{
-						$value = "";
+						$value = '""';
 					}
 					
 					break;
