@@ -31,8 +31,11 @@
 		public function renderCSVHeader($options, $dl = ";", $nl = "\n") {
 			$csv = "";
 			foreach ($this->columns as $column) {
-				if($column->isEnabled())
-					$csv .= $this->html2txt($column->getHeaderData()) . $dl;
+				if($column->isEnabled()) {
+					$data = $this->html2txt($column->getHeaderData());
+					$data = str_replace([$dl, $nl], '', $data);
+					$csv .= $data . $dl;
+				}
 			}
 			$csv .= $nl;
 
@@ -43,8 +46,11 @@
 			$csv = "";
 
 			foreach ($this->columns as $column) {
-				if($column->isEnabled())
-					$csv .= $this->html2txt($column->getData($obj, true)) . $dl;
+				if($column->isEnabled()) {
+					$data = $this->html2txt($column->getData($obj, true));
+					$data = str_replace([$dl, $nl], '', $data);
+					$csv .= $data . $dl;
+				}
 			}
 			$csv .= $nl;
 
