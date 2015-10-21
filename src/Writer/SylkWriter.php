@@ -152,7 +152,16 @@
 
 					if($value != intval($value))
 						$value = strtotime($value);
-					$value = round(($value/86400) + 25569);
+
+					if($value && $value > 0)
+					{
+						$value = round(($value/86400) + 25569);	
+					}
+					else
+					{
+						$value = "";
+					}
+					
 					break;
 				case("number"):
 					$value = str_replace(".", "", $value);

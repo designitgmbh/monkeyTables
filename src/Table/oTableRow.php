@@ -63,8 +63,10 @@
 			$formats = [];
 			$header = [];
 			foreach($this->columns as $column) {
-				$formats[] = $column->getType();
-				$header[] = $column->getHeaderData();
+				if($column->isEnabled()) {
+					$formats[] = $column->getType();
+					$header[] = $column->getHeaderData();
+				}
 			}
 
 			$this->writer->defineFormatting($formats);
@@ -75,7 +77,9 @@
 			$row = [];
 
 			foreach($this->columns as $column) {
-				$row[] = $column->getData($obj, true);
+				if($column->isEnabled()) {
+					$row[] = $column->getData($obj, true);
+				}
 			}
 			
 			$this->writer->addRow($row);
