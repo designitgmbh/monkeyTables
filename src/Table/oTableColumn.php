@@ -75,11 +75,19 @@
 
 		public function setEditableType($type, $options = []) {
 			$this->editable["type"] = $type;
+			$this->setEditableOptions($options);
 
+			return $this;
+		}
+
+		public function setEditableOptions($options) {
 			foreach($options as $key => $option) {
 				switch($key) {
 					case('ajaxRoute'):
 						$this->editable["ajaxRoute"] = $option;
+						break;
+					case('needsRefresh').
+						$this->editable["needsRefresh"] = $option ? true : false;
 						break;
 				}
 			}
@@ -367,6 +375,9 @@
 
 				if(isset($this->editable["ajaxRoute"]))
 					$cell["EDITABLEAJAXURL"] = $this->frameworkHelper->getRoute($this->editable["ajaxRoute"]);
+
+				if(isset($this->editable["needsRefresh"]))
+					$cell["EDITABLEMASSIVEUPDATE"] = true;
 			}
 
 			if($this->type == "timeline") {
