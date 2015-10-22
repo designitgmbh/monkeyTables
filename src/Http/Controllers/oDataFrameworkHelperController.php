@@ -49,7 +49,7 @@ class oDataFrameworkHelperController extends Controller
 		return trans($string);
 	}
 
-	public function getRoute($route, $arguments)
+	public function getRoute($route, $arguments = null)
 	{
 		return route($route, $arguments, false);
 	}

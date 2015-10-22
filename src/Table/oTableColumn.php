@@ -3,6 +3,7 @@
 
 	use Designitgmbh\MonkeyTables\Data\oDataChain;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
 
 	use Designitgmbh\MonkeyTables\Format\Currency;
 
@@ -34,12 +35,13 @@
 			$this->class 			= null;
 			$this->filters 			= array();
 			$this->centerClass 		= null;
+			$this->editable 		= array();
 		}
 
 		// getter functions //
 
 		public function isEditable() {
-			return (isset($this->editableRoute) && $this->editableRoute);
+			return (isset($this->editable["route"]) && $this->editable["route"]);
 		}
 
 		// setter functions //
@@ -64,10 +66,24 @@
 				$attribute = $this->valueKey;
 			}
 			
-			$this->editableRoute 	= $route;
-			$this->editableAttribute= $attribute;
-			$this->editableArgument	= $argument;
+			$this->editable["route"] 	= $route;
+			$this->editable["attribute"]= $attribute;
+			$this->editable["argument"]	= $argument;
 			
+			return $this;
+		}
+
+		public function setEditableType($type, $options = []) {
+			$this->editable["type"] = $type;
+
+			foreach($options as $key => $option) {
+				switch($key) {
+					case('ajaxRoute'):
+						$this->editable["ajaxRoute"] = $option;
+						break;
+				}
+			}
+
 			return $this;
 		}
 
@@ -231,7 +247,7 @@
 						$value = implode(", ", $value);
 						break;
 					case("nullableValue"):
-						$value = (is_null($value) ? oDataFrameworkHelperController::translate('labels.none') : $value);
+						$value = (is_null($value) ? oTablesFrameworkHelperController::translate('labels.none') : $value);
 						break;
 					case("string"):
 						if(empty($value))
@@ -331,7 +347,7 @@
 				$cell["TOOLTIP"] = $this->tooltip;
 
 			if($this->isEditable()) {
-				$arguments = $this->editableArgument;
+				$arguments = $this->editable["argument"];
 
 				if(is_array($arguments)) {
 					foreach ($arguments as $key => $argument) {
@@ -345,9 +361,12 @@
 					$arguments = oTablesFrameworkDBController::recursiveObjectGetter($obj, $arguments);
 				}
 
-				$cell["EDITABLE"] = $this->frameworkHelper->getRoute($this->editableRoute, $arguments);
-				$cell["EDITABLEATTRIBUTE"] = $this->editableAttribute;
-				$cell["EDITABLETYPE"] = $this->type;
+				$cell["EDITABLE"] = $this->frameworkHelper->getRoute($this->editable["route"], $arguments);
+				$cell["EDITABLEATTRIBUTE"] = $this->editable["attribute"];
+				$cell["EDITABLETYPE"] = isset($this->editable["type"]) ? $this->editable["type"] : $this->type;
+
+				if(isset($this->editable["ajaxRoute"]))
+					$cell["EDITABLEAJAXURL"] = $this->frameworkHelper->getRoute($this->editable["ajaxRoute"]);
 			}
 
 			if($this->type == "timeline") {
