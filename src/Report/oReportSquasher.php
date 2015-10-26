@@ -125,6 +125,7 @@
 			$dates = [];
 			$formatFromMinDate = true;
 			$businessYear = false;
+			$prependLabel = "";
 
 			switch($limits) {
 				case(is_array($limits)):
@@ -136,6 +137,7 @@
 					}
 
 					if(isset($limits['businessYear']) && is_array($limits['businessYear'])) {
+						$prependLabel = "BY ";
 						$businessYear = $limits['businessYear'];
 					}
 
@@ -170,6 +172,8 @@
 						$xValue = $dateFormated;
 						break;
 				}
+
+				$xValue = $prependLabel . $xValue;
 
 				$dates[$dateFormated] = new oReportDataSetEntry($xValue);
 			} while( $dateMin <= $dateMax );
