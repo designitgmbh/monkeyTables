@@ -135,6 +135,8 @@
 				"name"			=> $this->name,
 				"xAxisLabel" 	=> $this->xAxis->getLabel(),
 				"yAxisLabel" 	=> $this->yAxis->getLabel(),
+				"xAxisType" 	=> $this->xAxis->getType(),
+				"yAxisType" 	=> $this->yAxis->getType(),
 				"filters"		=> $this->createFilterHeader()
 			);
 		}
