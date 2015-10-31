@@ -130,6 +130,10 @@
 			return $this->filters[$number];
 		}
 
+		protected function needsRowsCount() {
+			return false;
+		}
+
 		private function createHeader() {
 			$this->header = array(
 				"name"			=> $this->name,
@@ -174,8 +178,11 @@
 
 			if(isset($this->request) && $this->filter == null)
 				$this->parseRequest();
-			
+
 			$this->prepareDBController();
+
+			if($this->dataSet->isEmpty())
+				return null;
 
 			oReportSquasher::squash($this->dataSet, $this->xAxis);
 			oReportJoiner::join($this->dataSet, $this->yAxis, $this->joinMethod);

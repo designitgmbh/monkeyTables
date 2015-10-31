@@ -37,6 +37,8 @@
 					default:
 						self::joinDefault($entry, $yAxis);
 				}
+
+				$entry->unsetObjects();
 			}
 				
 		}

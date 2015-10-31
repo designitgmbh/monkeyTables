@@ -57,6 +57,8 @@
 			$this->title  = "";
 			$this->subtitle = "";
 			$this->series = [];
+
+			$this->usePreparedStatement = false;
 		}
 
 		//setters
@@ -95,6 +97,15 @@
 
 		public function addFilters($filters) {
 			$this->filters = $filters;
+
+			return $this;
+		}
+
+
+		public function usePreparedStatement() {
+			$this->usePreparedStatement = true;
+
+			return $this;
 		}
 
 
@@ -234,12 +245,19 @@
 			$output 		= [];
 			$renderedSeries = [];
 
-			foreach($this->series as $series) {
+			$this->DBController->usePreparedStatement(
+				$this->usePreparedStatement
+			);
+
+			foreach($this->series as $key => $series) {
 				foreach($this->filters as $filter) {
 					$series->addFilter($filter[0], $filter[1]);
 				}
 
-				$renderedSeries[] = $series->render($this->helpController, $this->DBController);
+				$render = $series->render($this->helpController, $this->DBController);
+
+				if($render)
+					$renderedSeries[] = $render;
 			}
 
 			$output["header"] = [

@@ -60,6 +60,7 @@
 			$this->dataSet 	= [];
 
 			$this->presetHandler = null;
+			$this->select = null;
 		}
 
 		//setter
@@ -100,10 +101,18 @@
 
 		public function setName($name) {
 			$this->name = $name;
+
+			return $this;
 		}
 
 		public function setRequest( $request ) {
 			$this->request = $request;
+
+			return $this;
+		}
+
+		public function select($select) {
+			$this->select = $select;
 
 			return $this;
 		}
@@ -148,7 +157,6 @@
 				$filterArray = array();
 				foreach($this->filter as $filter) {
 					if($filter['value'] != "noFilter") {
-
 						$dataChain = $this->getDataChainByNumber($filter["column"]);
 
 						$filterArray[] = array(
@@ -168,8 +176,22 @@
 			return $filters;
 		}
 
+		protected function needsRowsCount() {
+			return true;
+		}
+
 		protected function prepareDBController() {
-			$this->DBController->init($this->source, $this->prefetch, $this->prejoin, $this->prefilter, $this->groupBy);
+			$this->DBController->init(
+				$this->source, 
+				$this->prefetch, 
+				$this->prejoin, 
+				$this->prefilter, 
+				$this->groupBy
+			);
+
+			$this->DBController
+				->setNeedsRowCount($this->needsRowsCount())
+				->setSelect($this->select);
 
 			$this->dataSet 		= $this->DBController->getRows($this->createFilters());
 			$this->rowsCount 	= $this->DBController->getRowsCount();

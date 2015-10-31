@@ -67,6 +67,18 @@
 		}
 
 		/**
+		 * Unset the array of objects for the dataSetEntry
+		 * to free up memory 
+		 * 
+		 */
+		public function unsetObjects() {
+			unset($this->objects);
+			$this->setObjects([]);
+
+			return $this;
+		}
+
+		/**
 		 * Add an object to the list of objects for the dataSetEntry
 		 * 
 		 * @param object						$object			The object to be added.

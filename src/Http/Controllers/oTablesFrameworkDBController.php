@@ -12,6 +12,10 @@ class oTablesFrameworkDBController
 	private $DBColumns;
 	private $selectClauses;
 
+	public function __construct() {
+		$this->usePreparedStatement = false;
+	}
+
 	public static function recursiveObjectGetter($obj, $string) {
 		if(!$string)
 			return null;
@@ -72,10 +76,37 @@ class oTablesFrameworkDBController
 		$this->mainTable = null;
 
 		$this->DBColumns = array();
+		$this->select = null;
 		$this->selectClauses = [];
+
+		$this->needsRowCount = true;
+	}
+
+	public function setNeedsRowCount($needsRowCount) {
+		if($needsRowCount)
+			$this->needsRowCount = true;
+		else
+			$this->needsRowCount = false;
+
+		return $this;
+	}
+
+	public function usePreparedStatement($use) {
+		$this->usePreparedStatement = $use;
+
+		return $this;
+	}
+
+	public function setSelect($select = null) {
+		$this->select = $select;
+
+		return $this;
 	}
 
 	public function getRowsCount() {
+		if($this->needsRowCount === false)
+			return 0;
+
 		if($this->rowCount !== false)
 			return $this->rowCount;
 
@@ -331,8 +362,13 @@ class oTablesFrameworkDBController
 		}
 
 		/* TOTAL ROW COUNT */
-		$countCollection = clone $collection;
-		$this->rowCount = $countCollection->count();
+		if($this->needsRowCount) {
+			$countCollection = clone $collection;
+			$this->rowCount = $countCollection->count();	
+		} else {
+			$this->rowCount = 0;
+		}
+		
 
 		/* SORTING */
 	
@@ -364,7 +400,14 @@ class oTablesFrameworkDBController
 			}
 		}
 
-		$this->selectClauses[] = $model->getTable().".*";
+		if($this->select === null) {
+			$this->selectClauses[] = $model->getTable().".*";
+		} else {
+			$this->selectClauses = array_merge(
+				$this->selectClauses,
+				$this->select
+			);
+		}		
 		$collection = $collection->select($this->selectClauses);
 
 		/* GROUP */
@@ -381,24 +424,67 @@ class oTablesFrameworkDBController
 			$collection = $collection->take($resultsPerPage);
 
 		/*var_dump(null);
-		var_dump($collection->toSql());
-		//var_dump($collection->get());
+		print_r($collection->toSql());
+		var_dump($collection->get());
 		var_dump(DB::getQueryLog());
 		$log = DB::getQueryLog();
 		//echo $log[19]['query'];
 		die("");//*/
 
-		try {
-			$returnSet = $collection->get();
-		} catch(Exception $Err) {
-			//try to reset the bindings and set them from the countCollection
-			$collection->getQuery()->setBindings([], 'select');
-			$collection->getQuery()->setBindings([], 'join');
-			$collection->getQuery()->setBindings([], 'where');
-			$collection->getQuery()->setBindings([], 'having');
-			$collection->getQuery()->setBindings([], 'order');			
-			$collection->getQuery()->mergeBindings($countCollection->getQuery());
-			$returnSet = $collection->get();
+		if($this->usePreparedStatement) {
+			//prepare the statement ourselves, and save it for
+			//later usage, if the query doesn't change
+
+			//create statement
+			$query = $collection->getQuery();
+			$connection = $query->getConnection();
+
+			$bindings = $query->getBindings();
+
+			if(!isset($this->statement)) {
+				$sqlQuery = $query->toSql();
+
+				$pdo = $connection->getReadPdo();
+				$statement = $pdo->prepare($sqlQuery);
+				$this->statement = $statement;	
+			} else {
+				$statement = $this->statement;	
+			}
+
+			//execute statement
+			$statement->execute($connection->prepareBindings($bindings));
+
+			$results = $statement->fetchAll($connection->getFetchMode());
+			//return $model->newCollection($results);
+
+			//bind results to model
+			$model = $collection->getModel();
+	        $connectionName = $model->getConnectionName();
+	        $models = $model->hydrate($results, $connection)->all();
+
+	        // If we actually found models we will also eager load any relationships that
+	        // have been specified as needing to be eager loaded, which will solve the
+	        // n+1 query issue for the developers to avoid running a lot of queries.
+	        if (count($models) > 0) {
+	            $models = $collection->eagerLoadRelations($models);
+	        }
+
+	        $returnSet = $model->newCollection($models);
+		} else {
+			//let eloquent do the job, don't save prepared statement
+
+			try {
+				$returnSet = $collection->get();
+			} catch(Exception $Err) {
+				//try to reset the bindings and set them from the countCollection
+				$collection->getQuery()->setBindings([], 'select');
+				$collection->getQuery()->setBindings([], 'join');
+				$collection->getQuery()->setBindings([], 'where');
+				$collection->getQuery()->setBindings([], 'having');
+				$collection->getQuery()->setBindings([], 'order');			
+				$collection->getQuery()->mergeBindings($countCollection->getQuery());
+				$returnSet = $collection->get();
+			}
 		}
 
 		return $returnSet;
@@ -431,6 +517,8 @@ class oTablesFrameworkDBController
 	protected function applyPrefilter(&$query) {
 		if(count($this->prefilter)>0) {
 			foreach($this->prefilter as $prefilter) {
+				if($prefilter["operator"] == 'IN')
+					$prefilter["value"] = DB::raw($prefilter["value"]);
 				$query->where($prefilter["field"], $prefilter["operator"], $prefilter["value"]);
 			}
 		}
