@@ -13,7 +13,9 @@ class oTablesFrameworkDBController
 	private $selectClauses;
 
 	public function __construct() {
+		$this->prefilterFilterValues = true;
 		$this->usePreparedStatement = false;
+		$this->filterValuesCache = [];
 	}
 
 	public static function recursiveObjectGetter($obj, $string) {
@@ -97,6 +99,12 @@ class oTablesFrameworkDBController
 		return $this;
 	}
 
+	public function prefilterFilterValues($do) {
+		$this->prefilterFilterValues = $do;
+
+		return $this;
+	}
+
 	public function setSelect($select = null) {
 		$this->select = $select;
 
@@ -147,6 +155,21 @@ class oTablesFrameworkDBController
 				continue;
 			}
 
+			if($this->usePreparedStatement) {
+				//we are reusing prepared statements, so we can
+				//also cache the filter values for the columns, 
+				//as all series will have the same filters
+
+				$hash = md5($column->valueKey . $this->modelNamespace . $this->source);
+
+				if(isset($this->filterValuesCache[$hash])) {
+					$values = $this->filterValuesCache[$hash];
+					$column->setFilterValues($values);
+
+					continue;	
+				}				
+			}
+
 			$DBColumn = $this->getDBColumnByValueKey($column->valueKey);
 
 			if(!$DBColumn->isFetchable()) {
@@ -164,9 +187,11 @@ class oTablesFrameworkDBController
 				$this->joinTable($query, $DBColumn);
 			}
 
-			//prefilter
-			$this->applyPrejoin($query);
-			$this->applyPrefilter($query);
+			if($this->prefilterFilterValues) {
+				//prefilter
+				$this->applyPrejoin($query);
+				$this->applyPrefilter($query);	
+			}			
 
 			$query = $query->select(array($DBColumn->getFieldName() . " as " . $key));
 			$query = $query->distinct();
@@ -177,6 +202,10 @@ class oTablesFrameworkDBController
 			foreach($result as $row) {
 				if(($val = $row->$key) && $val != "")
 					$values[$val] = $val;
+			}
+
+			if($this->usePreparedStatement) {
+				$this->filterValuesCache[$hash] = $values;
 			}
 
 			$column->setFilterValues($values);

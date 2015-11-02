@@ -245,9 +245,9 @@
 			$output 		= [];
 			$renderedSeries = [];
 
-			$this->DBController->usePreparedStatement(
-				$this->usePreparedStatement
-			);
+			$this->DBController
+				->prefilterFilterValues(false)
+				->usePreparedStatement($this->usePreparedStatement);
 
 			foreach($this->series as $key => $series) {
 				foreach($this->filters as $filter) {
