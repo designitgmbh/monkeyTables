@@ -160,6 +160,10 @@
 			return $this->filterable;
 		}
 
+		public function getChainNumber() {
+			return $this->chainNumber;
+		}
+
 		public function hasAutoFilterValues() {
 			return (isset($this->hasAutoFilterValues) && $this->hasAutoFilterValues);
 		}

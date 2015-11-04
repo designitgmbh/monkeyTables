@@ -17,6 +17,7 @@ class oDataFrameworkHelperController extends Controller
 	protected $_subjectTranslateString 	= "L_OTABLE_EXPORT_SUBJECT";
 	protected $_mailView 				= "emails.oTableExport";
 	protected $_printViewRoute 			= "oTable.printView";
+	protected $printViewConfigURL		= 'monkeyTables.export.printView.tablesUrl';
 
 	public static function setSystemUserSetting($settingKey, $settingValue, $userId = 0)
 	{
@@ -109,7 +110,7 @@ class oDataFrameworkHelperController extends Controller
 		//need to add slashes to JSON due to issues with slashes
 		$JSONRequest = $JSONRequest ?: Request::get('JSON');
 
-		$printViewUrl = config('monkeyTables.export.printView.url');
+		$printViewUrl = config($this->printViewConfigURL);
 		if($printViewUrl)
 		{
 			$printViewUrl = $this->generateFullUrl($printViewUrl);

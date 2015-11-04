@@ -14,7 +14,8 @@ return
 		'cookie' => '_sid',
 		'printView' => 
 		[
-			'url' => '/monkeyTablesPrintView.php'
+			'tablesUrl' => '/monkeyTablesPrintView.php',
+			'reportUrl' => '/monkeyReportsPrintView.php'
 		]
 	],
 

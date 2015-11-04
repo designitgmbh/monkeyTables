@@ -51,13 +51,13 @@
 		public function __construct($source, $name, $xAxis, $yAxis) {
 			parent::__construct();
 
+			$this->filters = [];
+
 			$this
 				->setSource($source)
 				->setName($name)
 				->setXAxis($xAxis)
 				->setYAxis($yAxis);
-
-			$this->filters = [];
 		}
 
 		//setters
@@ -75,6 +75,11 @@
 
 		public function setXAxis($xAxis) {
 			$this->xAxis = $xAxis;
+
+			if($filter = $this->xAxis->getAdditionalFilter()) {
+				$chainNumber = $filter->getChainNumber();
+				$this->filters[$chainNumber] = $filter;
+			}
 
 			return $this;
 		}

@@ -30,6 +30,13 @@
 		protected $type;
 
 		/**
+		 * An additional filter that may be used to set the dimensions of the axes
+		 * 
+		 * @var oReportFilter
+		 */
+		protected $additionalFilter;
+
+		/**
 		 * ???
 		 * TODO: refactor 
 		 *			CHECK IF WE CAN REMOVE IT
@@ -56,6 +63,9 @@
 		public function __construct($label, $valueKey, $type = null) {
 			parent::__construct($label, $valueKey);
 
+			$this->additionalFilter = null;
+			$this->renderValueKey = null;
+
 			$this->setType($type);
 			$this->setDataSet();
 		}
@@ -67,11 +77,119 @@
 			return $this;
 		}
 
+		public function renderValueKey($valueKey) {
+			$this->renderValueKey = $valueKey;
+
+			return $this;
+		}
+
 		//getter
 		public function getDataSet() {
 			return $this->dataSet;
 		}
+
+		public function getTypeOptions() {
+			$options = parent::getTypeOptions();
+
+			//if this is an x Axis and we are squashing by date
+			//we need to set the limits for the squasher in
+			//case that the user provided some filters
+			if($this->additionalFilter) {
+				$filter = $this->additionalFilter;
+				if($filter->getType() == 'date') {
+					$dates = explode('|', $filter->currentFilterValue);
+
+					if(count($dates) != 2)
+						return $options;
+
+					foreach([0 => 'from', 1 => 'to'] as $dateKey => $optionKey) {
+						$date = $dates[$dateKey];
+
+						if(!$date)
+							continue;
+
+						//check if date is in a timestamp + hour format
+						$explodedDate = explode(' ', $date);
+						if(count($explodedDate) > 1) {
+							$date = $explodedDate[0];
+						}
+
+						//check if date is timestamp, and add "@"
+						if($date == intval($date))
+							$date = "@" . $date;
+
+						//convert date to timestamp and pass it on
+						$options[$optionKey] = "@" . strtotime($date);
+					}
+				}
+			}
+
+			return $options;
+		}
+
+		public function getAdditionalFilterChainNumber() {
+			if($this->additionalFilter === null)
+				$this->setAdditionalFilter();
+
+			if($this->additionalFilter)
+				return $this->additionalFilter->getChainNumber();
+
+			return null;
+		}
+
+		public function getAdditionalFilter() {
+			if($this->additionalFilter === null)
+				$this->setAdditionalFilter();
+
+			return $this->additionalFilter;
+		}
 		
+		private function setAdditionalFilter() {
+			$label = "";
+			$valueKey = null;
+			$type = "";
+
+			//depends on the type of the axis and also
+			//if it is an x or y axis, currently it
+			//is only implmented for x axis
+
+			switch($this->type) {
+				case("DATE_YEAR"):
+				case("DATE_YEAR_SEQ"):
+					//one entry per year; format Y
+
+				case("DATE_MONTH_YEAR"):
+				case("DATE_MONTH"):
+				case("DATE_MONTH_SEQ"):
+					//one entry per month.year ; format m.Y
+				
+				case("DATE_DAY_MONTH_YEAR"):
+				case("DATE_DAY"):
+				case("DATE_DAY_SEQ"):
+					//one entry per day.month.year ; format d.m.Y
+				
+					//for now each date type will just have a
+					//normal datepicker - this should be enough
+					$label = "x-Axis";
+					$valueKey = $this->valueKey;
+					$type = "date";
+
+					break;
+
+				default:
+			}
+
+			if($label && $valueKey && $type) {
+				$hash = md5( $label . $valueKey . $type . "additionalFilter" );
+				$filter = (new oReportFilter($label, $valueKey, $type))
+						->setChainNumber($hash)
+						->setHasAutoFilterValues(false);
+			} else {
+				$filter = false;
+			}	
+
+			$this->additionalFilter = $filter;
+		}
 		/*
 		 * Render method for a given object.
 		 *
@@ -80,7 +198,8 @@
 		 * @return string|int
 		 */
 		public function render($obj) {
-			//return value
-			return oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->valueKey);
+			$valueKey = isset($this->renderValueKey) ? $this->renderValueKey : $this->valueKey;
+
+			return oTablesFrameworkDBController::recursiveObjectGetter($obj, $valueKey);
 		}
 	}
