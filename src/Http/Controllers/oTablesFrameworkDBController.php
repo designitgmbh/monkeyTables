@@ -27,6 +27,11 @@ class oTablesFrameworkDBController
 			$name = "sql" . md5($string);
 			return $obj->$name;
 		}
+
+		//remove alias symbols
+		if(strpos($string, "|", strpos($string, "|") + 1) !== false) {
+			$string = str_replace("|", "", $string);
+		}
 		
 		//check for recursion
 		if(strpos($string, "->") === false && strpos($string, "()") === false) {
@@ -743,6 +748,7 @@ class oTablesFrameworkDBControllerColumn {
 
 		foreach($relations as $relationKey => $relationString) {
 			//set defaults
+			$hasAlias 			= false;
 			$hasWhereClause 	= false;
 			$whereClauseAlias 	= "";
 			$whereClauses 		= [];
@@ -773,6 +779,11 @@ class oTablesFrameworkDBControllerColumn {
 					$whereClauses[] 	= $clauseArray;
 					$whereClauseAlias  .= join("", $clauseArray);
 				}
+			}
+
+			if(strpos($relationString, "|", strpos($relationString, "|") + 1) !== false) {
+				$hasAlias = true;
+				$relationString = str_replace("|", "", $relationString);
 			}
 
 			//set relation and keys
@@ -835,6 +846,13 @@ class oTablesFrameworkDBControllerColumn {
 					$key1 = str_replace($table, $aliasName, $key1);
 					$key2 = str_replace($table, $aliasName, $key2);
 				}
+			}
+
+			if($aliasName == $table && $hasAlias) {
+				$aliasName .= md5($relationString);
+
+				//replace table name in other key
+				$key2 = str_replace($table, $aliasName, $key2);
 			}
 
 			//the first key might need to use an alias name for its table
