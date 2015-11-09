@@ -132,7 +132,10 @@
 		}*/
 
 		protected function getDataChainByNumber($number) {
-			return $this->filters[$number];
+			if(isset($this->filters[$number]))
+				return $this->filters[$number];
+
+			return null;
 		}
 
 		protected function needsRowsCount() {

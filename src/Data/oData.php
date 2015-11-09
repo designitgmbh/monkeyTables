@@ -165,6 +165,9 @@
 					if($filter['value'] != "noFilter") {
 						$dataChain = $this->getDataChainByNumber($filter["column"]);
 
+						if(!$dataChain)
+							continue;
+
 						$filterArray[] = array(
 							"valueKey" 	=> $dataChain->getValueKey(),
 							"compare"  	=> $filter['compare'],
