@@ -231,8 +231,9 @@
 			$yAxisName = $this->yAxisName;
 			$sortingField = $this->sortingField;
 
+			$header = $this->header;
+
 			foreach($this->dataSet as $data) {
-				$header = $this->header;
 				$header['name'] = $data->$seriesName;
 
 				$xValue = $data->$xAxisName;
@@ -259,6 +260,11 @@
 				}
 
 				$this->prepareXValues($xValue, $sortingValue);
+
+				//since filters are merged from each series in the frontend
+				//anyways, we can unset it after the first series to
+				//save some data volume
+				$header["filters"] = [];
 			}
 
 			foreach($series as &$serie) {
