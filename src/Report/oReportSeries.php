@@ -14,7 +14,7 @@
 	class oReportSeries extends oData
 	{
 		//variables
-		private 
+		protected 
 			/**
 			 * The xAxis for the series
 			 * 
@@ -139,7 +139,7 @@
 			return false;
 		}
 
-		private function createHeader() {
+		protected function createHeader() {
 			$this->header = array(
 				"name"			=> $this->name,
 				"xAxisLabel" 	=> $this->xAxis->getLabel(),

@@ -256,8 +256,13 @@
 
 				$render = $series->render($this->helpController, $this->DBController);
 
-				if($render)
-					$renderedSeries[] = $render;
+				if($render) {
+					if($series instanceof oReportMultiSeries) {
+						$renderedSeries = array_merge($renderedSeries, $render);
+					} else {
+						$renderedSeries[] = $render;	
+					}					
+				}
 			}
 
 			$output["header"] = [

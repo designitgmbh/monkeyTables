@@ -48,7 +48,13 @@
 			 * 
 			 * @var array
 			 */
-			$dataSet;
+			$dataSet,
+			/**
+			 * An array of strings containing the select options for the DB request
+			 * 
+			 * @var array
+			 */
+			$select;
 
 		public function __construct($name = "") {
 			$this->prefetch = array();
