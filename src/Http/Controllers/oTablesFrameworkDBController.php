@@ -3,6 +3,7 @@
 namespace Designitgmbh\MonkeyTables\Http\Controllers;
 
 use DB;
+use Cache;
 
 class oTablesFrameworkDBController
 {
@@ -146,35 +147,46 @@ class oTablesFrameworkDBController
 	}
 
 	public function getFilterValuesForColumns($columns) {
-		//need to cache this URGENTLY!
 		$source 		= $this->modelNamespace . $this->source;
 		$model 			= new $source;
 		$this->mainTable= $model->getTable();
 
-		foreach($columns as $key => $column) {
-			if($column->hasAutoFilterValues()) {
-				if($column->hasFilterValuesAlreadySet())
-					continue;
-			} else {
-				$column->setFilterValues([]);
-				continue;
-			}
+		foreach($columns as $columnKey => $column) {
+			$this->setFilterValuesForColumn($column, $columnKey);
+		}
 
-			if($this->usePreparedStatement) {
-				//we are reusing prepared statements, so we can
-				//also cache the filter values for the columns, 
-				//as all series will have the same filters
+		return true;
+	}
 
-				$hash = md5($column->valueKey . $this->modelNamespace . $this->source);
+	private function setFilterValuesForColumn(&$column, $columnKey) {
+		//early return checks
+		if(!$column->hasAutoFilterValues()) {
+			$column->setFilterValues([]);
+			return;
+		}
 
-				if(isset($this->filterValuesCache[$hash])) {
-					$values = $this->filterValuesCache[$hash];
-					$column->setFilterValues($values);
+		if($column->hasFilterValuesAlreadySet()) {
+			return;
+		}
 
-					continue;	
-				}				
-			}
+		//the cache hash
+		$hash = md5($column->valueKey . $this->modelNamespace . $this->source);
 
+		if($this->usePreparedStatement) {
+			//we are reusing prepared statements, so we can
+			//also cache the filter values for the columns, 
+			//as all series will have the same filters
+
+			if(isset($this->filterValuesCache[$hash])) {
+				$values = $this->filterValuesCache[$hash];
+				$column->setFilterValues($values);
+
+				return;	
+			}				
+		}	
+
+		$cacheName = 'monkeyTablesColumnFilterValues::' . $hash;
+		$values = Cache::remember($cacheName, 120, function() use ($column, $columnKey, $hash) {
 			$DBColumn = $this->getDBColumnByValueKey($column->valueKey);
 
 			if(!$DBColumn->isFetchable()) {
@@ -182,7 +194,7 @@ class oTablesFrameworkDBController
 					->setSortable(false)
 					->setFilterable(false);
 
-				continue;
+				return;
 			}
 
 			$query = DB::table($this->mainTable);
@@ -193,19 +205,20 @@ class oTablesFrameworkDBController
 			}
 
 			if($this->prefilterFilterValues) {
-				//prefilter
 				$this->applyPrejoin($query);
 				$this->applyPrefilter($query);	
 			}			
 
-			$query = $query->select(array($DBColumn->getFieldName() . " as " . $key));
+			$query = $query->select([
+				$DBColumn->getFieldName() . " as " . $columnKey
+			]);
 			$query = $query->distinct();
-
+			
 			$result = $query->take(100)->get();
 
 			$values = array();
 			foreach($result as $row) {
-				if(($val = $row->$key) && $val != "")
+				if(($val = $row->$columnKey) && $val != "")
 					$values[$val] = $val;
 			}
 
@@ -213,10 +226,12 @@ class oTablesFrameworkDBController
 				$this->filterValuesCache[$hash] = $values;
 			}
 
+			return $values;
+		});
+
+		if(is_array($values)) {
 			$column->setFilterValues($values);
 		}
-
-		return true;
 	}
 
 	private function resetJoins() {
