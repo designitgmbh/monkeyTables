@@ -89,13 +89,26 @@
 			switch($squashMethod) {
 				case("DATE_BUSINESS_YEAR"):
 					$this->squashSelect = DB::raw(
-						"IF(MONTH(FROM_UNIXTIME( $squashField )) > 3, YEAR(FROM_UNIXTIME( $squashField )) + 1, YEAR(FROM_UNIXTIME( $squashField ))) as $xAxisName"
+						"CONCAT(
+							'BY ',
+							IF(
+								MONTH(FROM_UNIXTIME( $squashField )) > 3, 
+								YEAR(FROM_UNIXTIME( $squashField )) + 1, 
+								YEAR(FROM_UNIXTIME( $squashField ))
+							)
+						) as $xAxisName"
 					);
 					break;
 
 				case("DATE_MONTH"):
 					$this->squashSelect = DB::raw(
 						"CONCAT(DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'), '.', YEAR(FROM_UNIXTIME( $squashField ))) as $xAxisName"
+					);
+					break;
+
+				case("VALUE"):
+					$this->squashSelect = DB::raw(
+						"$squashField as $xAxisName"
 					);
 					break;
 
