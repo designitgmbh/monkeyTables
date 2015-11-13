@@ -333,7 +333,9 @@
 
 			if(is_array($this->hiddenColumns) && count($this->hiddenColumns) > 0) {
 				foreach($this->hiddenColumns as $columnNumber) {
-					$this->columns[$columnNumber]->disable();
+					if(isset($this->columns[$columnNumber])) {
+						$this->columns[$columnNumber]->disable();
+					}
 				}
 			}
 
@@ -341,8 +343,10 @@
 				$columns = $this->columns;
 				$this->columns = array();
 				foreach($this->columnArrangement as $key => $value) {
-					$columns[$value]->setChainNumber($value);
-					array_push($this->columns, $columns[$value]);
+					if(isset($this->columns[$value])) {
+						$columns[$value]->setChainNumber($value);
+						array_push($this->columns, $columns[$value]);
+					}
 				}
 			} else {
 				foreach($this->columns as $key => $column) {
