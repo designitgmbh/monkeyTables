@@ -200,7 +200,7 @@
 			if($this->type == "currency")
 				return "currency";
 
-			if($this->type == "date")
+			if($this->type == "date" || $this->type == "timeline")
 				return "date";
 
 			if($this->type == "datetime")
