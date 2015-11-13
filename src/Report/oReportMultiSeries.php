@@ -102,7 +102,11 @@
 
 				case("DATE_MONTH"):
 					$this->squashSelect = DB::raw(
-						"CONCAT(DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'), '.', YEAR(FROM_UNIXTIME( $squashField ))) as $xAxisName"
+						"CONCAT(
+							DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'), 
+							'.', 
+							YEAR(FROM_UNIXTIME( $squashField ))
+						) as $xAxisName"
 					);
 					break;
 

@@ -345,6 +345,9 @@
 			$cell["DATA"] = $this->getCellValue($obj);
 			$cell["LINK"] = $this->getCellLink($obj);
 
+			if(isset($this->chainNumber))
+				$cell["COLUMNNUMBER"] = $this->chainNumber;
+
 			if(isset($this->class))
 				$cell["CLASS"] = $this->class;
 
