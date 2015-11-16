@@ -343,7 +343,7 @@
 				$columns = $this->columns;
 				$this->columns = array();
 				foreach($this->columnArrangement as $key => $value) {
-					if(isset($this->columns[$value])) {
+					if(isset($columns[$value])) {
 						$columns[$value]->setChainNumber($value);
 						array_push($this->columns, $columns[$value]);
 					}
