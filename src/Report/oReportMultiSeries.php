@@ -255,6 +255,15 @@
 
 				$xValue = $data->$xAxisName;
 				$yValue = $data->$yAxisName;
+
+				switch($this->yAxis->getType()) {
+					case("integer"):
+					case("number"):
+					case("currency"):
+						$yValue = (int)$yValue;
+						break;
+				}
+				
 				$sortingValue = $data->$sortingField;
 
 				if(isset($series[$data->$seriesID])) {
