@@ -1,0 +1,691 @@
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 127px;
+}
+.sticky-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 127px;
+}
+
+/*************************************************************************************************************
+General LAb Style **************************** General LAb Style **************************** General LAb Style
+*************************************************************************************************************/
+
+.navbar-fixed-top #menuline{
+  height: 12px;
+  background-image: url("../images/menuline.png");
+  background-position: center;
+  background-size: cover;
+}
+
+#designitlabs h5{
+  font-size: 20px;
+  font-weight: 300;
+  color: #999;
+  margin-top: 30px;
+}
+
+#designitlabs h3{
+  font-size: 27px;
+  font-weight: 300;
+  color: #333;
+  margin-top: 30px;
+}
+
+#designitlabs h6{
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+footer.grey{
+  background-color: #F6F6F6;
+}
+
+footer{
+  padding-bottom: 0;
+}
+
+#designitlabs .title h1{
+  text-transform: none;
+}
+
+#designitlabs header.container {
+  margin-bottom: 10px;
+}
+
+#designitlabs .btn-custom, #designitlabs a.btn-custom , #designitlabs  a.btn-custom:hover{
+    color: white;
+    text-decoration: none;
+}
+
+.linea{
+  width: 30px;
+  border-top: 1px solid #333;
+}
+
+.linealight{
+  width: 30px;
+  border-top: 1px solid #d1d2d4;
+}
+
+pre {
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.borderleft{
+  border-left: 1px solid #d1d2d4;
+  padding-left: 40px;
+}
+
+.borderright{
+  border-right: 1px solid #d1d2d4;
+}
+
+#designitlabs section{
+  padding-bottom: 0;
+}
+
+.lightgrey{
+  color: #d1d2d4;
+}
+
+#designitlabs .navbar-collapse {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+/* =download button
+-------------------------------------------------------------- */
+.download-btn{
+  float: left;
+}
+
+p.download-info{
+  font-size: 10px;
+  color: #999;
+  float: left;
+  padding-top: 4px;
+  margin-left: 10px; 
+}
+
+.download .fa{
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+/* =MenuLists
+-------------------------------------------------------------- */
+.MenuLabList h4{
+  font-size: 23px;
+  font-weight: 600;
+  color: #d1d2d4;
+}
+
+.MenuLabList.dark h4{
+  font-size: 23px;
+  font-weight: 600;
+  color: #333;
+}
+
+.MenuLabList a{
+  text-decoration: none !important;
+  color: #999 !important;
+}
+
+.MenuLabList ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+}
+
+.MenuLabList ul li {
+  color: #999;
+}
+
+.MenuLabList li a.active{
+  font-weight: 600 !important;
+  color: black!important;
+}
+
+/* =SubLists
+-------------------------------------------------------------- */
+.SubLabList ul {
+  margin: 0;
+  list-style: none;
+}
+
+.SubLabList ul li {
+  color: #333;
+}
+
+.SubLabList a{
+  text-decoration: none !important;
+  color: #fbaf3f;
+}
+
+.SubLabList a:hover{
+  text-decoration: none !important;
+  color: #f7931d;
+}
+
+.SubLabList li.active a{
+  font-weight: 600;
+  color: #fbaf3f;
+}
+
+.SubLabList .fa{
+  color: #999;
+  margin-right: 10px;
+}
+
+
+/* =Lists
+-------------------------------------------------------------- */
+.LabList ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.LabList ul li {
+  color: #333;
+}
+
+.LabList a{
+  text-decoration: none;
+  color: #fbaf3f;
+}
+
+.LabList a:hover{
+  text-decoration: none;
+  color: #f7931d;
+}
+
+.LabList li.active a{
+  font-weight: 600;
+  color: black;
+}
+
+.LabList .fa{
+  color: #999;
+  margin-right: 10px;
+}
+
+.LabList {
+  margin: 0 0 20px 20px;
+}
+
+
+/* =Line Separator
+-------------------------------------------------------------- */
+.fav-line{
+margin: 30px 0 30px 0;
+}
+
+.fav-line .line{
+  margin-top: 10px;
+  border-top: 1px solid #d1d2d4;
+}
+
+.fav-line .date{
+  padding-left: 0 !important;
+  font-size: 13px;
+  color: #999;
+}
+
+.fav-line .fav-img img{
+  height: 20px;
+}
+
+/* =note
+-------------------------------------------------------------- */
+.note{
+  color: white;
+  font-size: 15px;
+  background-color: #f5f2f0;
+  border-color: #f5f2f0;
+  border-radius: 4px;
+}
+
+.note .note-title{
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.note p{
+  padding: 10px;
+}
+
+/* =modal
+-------------------------------------------------------------- */
+#designitlabs .modal-header{
+  background-color: white;
+  border-radius: 4px 4px 0 0;
+}
+
+#designitlabs .modal-header button.close{
+  padding: 15px 0 0;
+}
+
+#designitlabs .modal-body{
+  background-color: #eaeaea;
+  padding: 20px 20px 0;
+}
+
+#designitlabs .modal-footer{
+  border-top: transparent;
+  margin-top: 0;
+  padding: 4px;
+  background-color: #eaeaea;
+  border-radius: 0  0 4px 4px;
+}
+
+/* =projects
+-------------------------------------------------------------- */
+#designitlabs .project-name{
+  text-transform: none;
+  font-size: 30px;
+  padding-bottom: 10px;
+}
+
+#designitlabs .project-overlay a {
+  text-decoration: none;
+}
+
+#designitlabs .project-overlay a:hover{
+  text-decoration: none;
+}
+
+
+#designitlabs .project-overlay{
+  height: 94.5%;
+  width: 94.5%;
+  color: #515151;
+  overflow: auto;
+  margin: auto;
+  top: 0; left: 0; bottom: 0; right: 0;
+  cursor: default;
+}
+
+#designitlabs .project-description{
+  text-align: left;
+}
+
+#designitlabs .project-overlay i{
+  border: none;
+}
+
+#designitlabs .project-icons .fa{
+  font-size: 30px;
+}
+
+#designitlabs .project-icons {
+  float: left;
+  position: absolute;
+  bottom: 0;
+}
+
+#designitlabs #projects-grid li:hover .project-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+
+/* =search
+-------------------------------------------------------------- */
+#designitlabs .search-box.has-feedback .form-control-feedback{
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #ccc;
+}
+
+#designitlabs .search-box.has-feedback .form-control {
+    padding-left: 35px;
+    padding-right: 5px;
+}
+
+#designitlabs .search-box.form-group{
+  margin-top: 7px;
+}
+
+#designitlabs .search-box .form-control{
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 0 0 0;
+  color: #333;
+  transition: border-color .5s ease;
+}
+
+#designitlabs .search-box .form-control:focus {
+    border-color: #333;
+    box-shadow: 0 0 0 0;
+}
+
+#designitlabs .search-box .form-control::-moz-placeholder {
+    color: #ccc;
+    opacity: 1;
+}
+
+
+/* =dropdown
+-------------------------------------------------------------- */
+#designitlabs .dropdown .btn-default {
+  background-color: #fff;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  color: #ccc;
+  width: 100%;
+  font-weight: 300;
+  text-align: left;
+  transition: border-color .5s ease;
+}
+
+#designitlabs .dropdown .btn-default:hover, #designitlabs .dropdown .btn-default:focus, #designitlabs .dropdown .btn-default:active{
+  border-color: #333;
+}
+
+#designitlabs .dropdown{
+  padding: 0;
+}
+
+#designitlabs .dropdown-menu{
+  box-shadow: 0 0 0 0;
+  width: 100%;
+}
+
+#designitlabs .dropdown-header{
+  color: #333;
+}
+
+#designitlabs .dropdown-menu a{
+  text-decoration: none;
+  font-weight: 300;
+  color: #999;
+}
+
+#designitlabs .dropdown-menu a:hover{
+  text-decoration: none;
+  color: #333;
+  background: white;
+}
+
+/*************************************************************************************************************
+DESIGNIT LAB *********************************** DESIGNIT LAB *********************************** DESIGNIT LAB
+*************************************************************************************************************/
+
+#designitlabs #dlab_menuline{
+  height: 12px;
+  background-image: url("../images/labs/dlab/menuline.png");
+  background-position: center;
+  background-size: cover;
+}
+
+#dlab a{
+  text-decoration: underline;
+  color: #f05632;
+}
+
+#dlab a:hover{
+  text-decoration: underline;
+  color: #de4326;
+}
+
+#dlab .note{
+  background-color: #f05632;
+  border-color: #de4326;
+}
+
+#dlab .MenuLabList a:hover{
+  text-decoration: none;
+  color: #de4326 !important;
+}
+
+#dlab .MenuLabList li a.active{
+  color: #f05632 !important;
+}
+
+#dlab .SubLabList a{
+  text-decoration: none !important;
+  color: #f05632;
+}
+
+#dlab .SubLabList a:hover{
+  text-decoration: none !important;
+  color: #de4326;
+}
+
+#dlab .LabList a{
+  text-decoration: none;
+  color: #f05632;
+}
+
+#dlab .LabList a:hover{
+  text-decoration: none;
+  color: #de4326;
+}
+
+#dlab .btn-custom {
+    background-color: #f05632;
+    border-color: #de4326;
+}
+
+#dlab .btn-custom:hover {
+    background-color: #de4326;
+    border-color: #de4326;
+}
+
+/* =DLAB blog
+-------------------------------------------------------------- */
+#dlab #dlabBlog h2{
+  margin-bottom: 3px;
+}
+
+#dlab .fav-line{
+margin-bottom: 20px;
+}
+
+#dlab #dlabBlog{
+  padding-bottom: 0px;
+}
+
+.bloginfo{
+  padding: 0 18px;
+}
+
+
+/* =DLAB ourLabs
+-------------------------------------------------------------- */
+
+#designitlabs #dlab .project-icons .fa{
+  color: #f05632;
+} 
+
+#designitlabs #dlab .project-icons .fa:hover{
+  color: #e24527;
+}
+
+
+/* =DLAB showcases
+-------------------------------------------------------------- */
+
+#dlab .search-box .form-control:focus {
+    border-color: #de4326;
+}
+
+#dlab .dropdown .btn-default:hover, #dlab .dropdown .btn-default:focus, #dlab .dropdown .btn-default:active{
+    border-color: #f05632;
+}
+
+#dlab .dropdown-menu a:hover{
+  color: #de4326;
+}
+
+/*************************************************************************************************************
+MONKEYTABLES *********************************** MONKEYTABLES *********************************** MONKEYTABLES
+*************************************************************************************************************/ 
+#designitlabs #mt_menuline{
+  height: 12px;
+  background-image: url("../images/labs/monkeytables/mt_menuline.png");
+  background-position: center;
+  background-size: cover;
+}
+
+#monkeytables a{
+  text-decoration: underline;
+  color: #f7931d;
+}
+
+#monkeytables a:hover{
+  text-decoration: underline;
+  color: #da7f24;
+}
+
+#monkeytables .note{
+  background-color: #f7931d;
+  border-color: #da7f24;
+}
+
+#monkeytables .MenuLabList a:hover{
+  text-decoration: none;
+  color: #da7f24 !important;
+}
+
+#monkeytables .MenuLabList li a.active{
+  color: #f7931d !important;
+}
+
+#monkeytables .SubLabList a{
+  text-decoration: none !important;
+  color: #f7931d;
+}
+
+#monkeytables .SubLabList a:hover{
+  text-decoration: none !important;
+  color: #da7f24;
+}
+
+#monkeytables .LabList a{
+  text-decoration: none;
+  color: #f7931d;
+}
+
+#monkeytables .LabList a:hover{
+  text-decoration: none;
+  color: #da7f24;
+}
+
+#monkeytables .btn-custom {
+    background-color: #f7931d;
+    border-color: #da7f24;
+}
+
+#monkeytables .btn-custom:hover {
+    background-color: #da7f24;
+    border-color: #da7f24;
+}
+
+#monkeytables .search-box .form-control:focus {
+    border-color: #da7f24;
+}
+
+#monkeytables .dropdown .btn-default:hover, #monkeytables .dropdown .btn-default:focus, #monkeytables .dropdown .btn-default:active{
+    border-color: #f7931d;
+}
+
+#monkeytables .dropdown-menu a:hover{
+  color: #da7f24;
+}
+
+
+
+/* =MONKEYTABLES intro
+-------------------------------------------------------------- */
+#monkeytables #demos{
+  position: relative;
+  background-color: #F6F6F6;
+}
+
+#demos.section{
+  padding-top: 0px;
+  padding-bottom: 0px;
+  min-height: 0;
+}
+
+.show-demos{
+  padding: 20px;
+  padding-left: 40px;
+}
+
+
+/* =MONKEYTABLES download
+-------------------------------------------------------------- */
+#monkeytablesDownload hr{
+  margin-bottom: 45px;
+}
+
+/* =MONKEYTABLES support
+-------------------------------------------------------------- */
+#monkeytablesSupport.section{
+  padding-bottom: 0px;
+}
+
+
+#designitlabs .mt-info{
+  display: none;
+}
+
+#designitlabs .mt-info.show-mt-info{
+  display: block;
+}
+
+/* =MONKEYTABLES docs
+-------------------------------------------------------------- */
+#monkeytables .search-box.has-feedback .form-control-feedback{
+  top: 30px;
+}
+
+#monkeytables .search-box .form-control:focus {
+    border-color: #da7f24;
+}
+
+
+/*************************************************************************************************************
+MEDIA QUERIES ********************************* MEDIA QUERIES ********************************** MEDIA QUERIES
+*************************************************************************************************************/
+
+@media (max-width: 768px) {
+  #designitlabs #projects-grid li {
+    width: 48%;
+  }
+
+  .paddingRight40{
+    padding-right: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  #designitlabs #projects-grid li {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+  #designitlabs a#logo{
+    padding: 13px 3px 15px 5px;
+    width: auto;
+  }
+}
