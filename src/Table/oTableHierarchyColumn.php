@@ -10,6 +10,8 @@
 	 */
 	class oTableHierarchyColumn extends oTableColumn
 	{
+		protected $canRearrangeColumns = false;
+
 		/**
 		 * extend initValues function
 		 */

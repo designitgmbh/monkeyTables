@@ -16,6 +16,8 @@
 	 */
 	class oTableColumn extends oDataChain
 	{
+		protected $canRearrangeColumns = true;
+
 		/* constructor */
 		public function __construct($label, $valueKey, $sortable = true, $filterable = true, $displayHeader = true) {
 			parent::__construct($label, $valueKey);
@@ -318,6 +320,8 @@
 			if($this->type == "timeline") {
 				$cell["TIMELINE"] = true;
 			}
+
+			$cell["CANREARRANGECOLUMNS"] = $this->canRearrangeColumns;
 
 			return $cell;
 		}
