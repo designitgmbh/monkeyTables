@@ -864,10 +864,10 @@ class oTablesFrameworkDBControllerColumn {
 			}
 
 			if($aliasName == $table && $hasAlias) {
-				$aliasName .= md5($relationString);
+				$aliasName .= md5($this->valueKey);
 
 				//replace table name in other key
-				$key2 = str_replace($table, $aliasName, $key2);
+				$key1 = str_replace($table, $aliasName, $key1);
 			}
 
 			//the first key might need to use an alias name for its table
