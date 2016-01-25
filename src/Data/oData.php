@@ -88,11 +88,12 @@
 			return $this;
 		}
 
-		public function prefilter($field, $operator, $value) {
+		public function prefilter($field, $operator, $value, $type="") {
 			array_push($this->prefilter, array(
 					"field" => $field,
 					"operator" => $operator,
-					"value" => $value
+					"value" => $value,
+					"type" => $type
 				)
 			);
 

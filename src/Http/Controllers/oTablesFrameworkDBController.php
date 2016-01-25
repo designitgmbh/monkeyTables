@@ -568,7 +568,18 @@ class oTablesFrameworkDBController
 			foreach($this->prefilter as $prefilter) {
 				if($prefilter["operator"] == 'IN')
 					$prefilter["value"] = DB::raw($prefilter["value"]);
-				$query->where($prefilter["field"], $prefilter["operator"], $prefilter["value"]);
+
+				if($prefilter["type"]=="OR"){
+					$query->where(function($query) use ($prefilter)
+					{
+						for($i=0; $i<count($prefilter["field"]); $i++) {
+							$query->orWhere($prefilter["field"][$i], $prefilter["operator"][$i], $prefilter["value"][$i]);
+						}
+					});
+				}
+				else{
+					$query->where($prefilter["field"], $prefilter["operator"], $prefilter["value"]);
+				}
 			}
 		}
 	}
@@ -867,7 +878,9 @@ class oTablesFrameworkDBControllerColumn {
 				$aliasName .= md5($this->valueKey);
 
 				//replace table name in other key
-				$key1 = str_replace($table, $aliasName, $key1);
+				//preg_replace to ensure that it's changed only the name of the corresponding table
+				$key1 = preg_match("!^({$table})\.!im", $key1)? str_replace($table, $aliasName, $key1):$key1;
+				$key2 = preg_match("!^({$table})\.!im", $key2)? str_replace($table, $aliasName, $key2):$key2;
 			}
 
 			//the first key might need to use an alias name for its table
