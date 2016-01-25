@@ -366,9 +366,9 @@ class oTablesFrameworkDBController
 								$subquery = $subquery->$function(
 									DB::raw("LOWER(" . $fieldName . ")"), 
 									$compare, 
-									is_string($value) ? 
-										DB::raw("LOWER('$value')") :
-										$value
+									is_numeric($value) ?
+										DB::raw("$value") :
+										DB::raw("LOWER('$value')") 
 								);
 							}
 						});						
