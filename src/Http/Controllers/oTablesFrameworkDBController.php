@@ -318,61 +318,18 @@ class oTablesFrameworkDBController
 				}
 
 				$collection = $collection->where(function($query) use ($fieldName, $values, $compare) {
-					foreach($values as $value) {
-						$funcArr 	= array();
-						$compareArr = array();
-						$valueArr 	= array();
+					if(!is_array($values))
+					{
+							$value=$values;
+							$this->filteringComparision($query, $fieldName, $value, $compare);
 
-						switch($compare) {
-							case("between"):
-								$between = explode("|", $value);
-								if($between[0]) {
-									$funcArr[] 		= "where";
-									$compareArr[] 	= ">=";
-									$valueArr[] 	= $between[0];
-								}
-								if($between[1]) {
-									$funcArr[] 		= "where";
-									$compareArr[] 	= "<=";
-									$valueArr[] 	= $between[1];
-								}
-								break;
-							case("contains"):
-								$funcArr[] 		= "where";
-								$compareArr[] 	= "LIKE";
-								$valueArr[]		= "%" . $value . "%";
-								break;
-							case("exists"):
-								if($value == "true" || $value === true) {
-									$funcArr[] 	= 'whereNotNull'; 
-								} else {
-									$funcArr[] 	= 'whereNull'; 
-								}
-								$compareArr[] = '';
-								$valueArr[] = '';
-								break;
-							default:
-								$funcArr[] 		= "where";
-								$compareArr[] 	= $compare;
-								$valueArr[] 	= $value;
-								break;
-						}
-
-						$query = $query->orWhere(function($subquery) use($fieldName, $value, $compare, $compareArr, $funcArr, $valueArr) {
-							foreach($compareArr as $key => $compare) {
-								$function = $funcArr[$key];
-								$value = $valueArr[$key];
-
-								$subquery = $subquery->$function(
-									DB::raw("LOWER(" . $fieldName . ")"), 
-									$compare, 
-									is_numeric($value) ?
-										DB::raw("$value") :
-										DB::raw("LOWER('$value')") 
-								);
-							}
-						});						
-					}	
+					}
+					else
+					{
+						foreach($values as $value) {
+							$this->filteringComparision($query, $fieldName, $value, $compare);			
+						}	
+					}
 				});							
 			}
 		}
@@ -537,6 +494,67 @@ class oTablesFrameworkDBController
 		}
 
 		return $returnSet;
+	}
+
+	/**
+	 * Compares the values when filtering
+	 * @return void
+	 */
+	protected function filteringComparision($query, $fieldName, $value, $compare)
+	{
+		$funcArr 	= array();
+		$compareArr = array();
+		$valueArr 	= array();
+
+		switch($compare) {
+			case("between"):
+				$between = explode("|", $value);
+				if($between[0]) {
+					$funcArr[] 		= "where";
+					$compareArr[] 	= ">=";
+					$valueArr[] 	= $between[0];
+				}
+				if($between[1]) {
+					$funcArr[] 		= "where";
+					$compareArr[] 	= "<=";
+					$valueArr[] 	= $between[1];
+				}
+				break;
+			case("contains"):
+				$funcArr[] 		= "where";
+				$compareArr[] 	= "LIKE";
+				$valueArr[]		= "%" . $value . "%";
+				break;
+			case("exists"):
+				if($value == "true" || $value === true) {
+					$funcArr[] 	= 'whereNotNull'; 
+				} else {
+					$funcArr[] 	= 'whereNull'; 
+				}
+				$compareArr[] = '';
+				$valueArr[] = '';
+				break;
+			default:
+				$funcArr[] 		= "where";
+				$compareArr[] 	= $compare;
+				$valueArr[] 	= $value;
+				break;
+		}
+
+		$query = $query->orWhere(function($subquery) use($fieldName, $value, $compare, $compareArr, $funcArr, $valueArr) {
+			foreach($compareArr as $key => $compare) {
+				$function = $funcArr[$key];
+				$value = $valueArr[$key];
+
+				$subquery = $subquery->$function(
+					DB::raw("LOWER(" . $fieldName . ")"), 
+					$compare, 
+					is_numeric($value) ?
+						DB::raw("$value"):
+						DB::raw("LOWER('$value')") 
+				);
+			}
+		});
 	}
 
 	/**
