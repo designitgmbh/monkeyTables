@@ -251,7 +251,7 @@
 
 			foreach($this->series as $key => $series) {
 				foreach($this->filters as $filter) {
-					$series->addFilter($filter[0], $filter[1]);
+					$series->addFilter($filter[0], $filter[1], isset($filter[2]) ? $filter[2] : null);
 				}
 
 				$render = $series->render($this->helpController, $this->DBController);
