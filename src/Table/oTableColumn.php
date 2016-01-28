@@ -42,8 +42,12 @@
 
 		// getter functions //
 
-		public function isEditable() {
-			return (isset($this->editable["route"]) && $this->editable["route"]);
+		public function isEditable($obj = null) {
+			$hasRoute = isset($this->editable["route"]) && $this->editable["route"];
+			$isNotBlocked = isset($this->editable["editableConstraint"]) ? 
+				$this->editable["editableConstraint"]($obj) : true;			
+
+			return ($hasRoute && $isNotBlocked);
 		}
 
 		// setter functions //
@@ -85,10 +89,13 @@
 		public function setEditableOptions($options) {
 			foreach($options as $key => $option) {
 				switch($key) {
+					case('editableConstraint'):
+						$this->editable["editableConstraint"] = $option;
+						break;
 					case('ajaxRoute'):
 						$this->editable["ajaxRoute"] = $option;
 						break;
-					case('needsRefresh').
+					case('needsRefresh'):
 						$this->editable["needsRefresh"] = $option ? true : false;
 						break;
 				}
@@ -361,7 +368,7 @@
 			if(isset($this->tooltip))
 				$cell["TOOLTIP"] = $this->tooltip;
 
-			if($this->isEditable()) {
+			if($this->isEditable($obj)) {
 				$arguments = $this->editable["argument"];
 
 				if(is_array($arguments)) {
