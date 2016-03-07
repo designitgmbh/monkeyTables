@@ -370,11 +370,15 @@ class oTablesFrameworkDBController
 		/* TOTAL ROW COUNT */
 		if($this->needsRowCount) {
 			$countCollection = clone $collection;
-			$this->rowCount = $countCollection->count();	
+
+			$distinctCountColumn = $this->groupBy ?: $model->getTable() . "." .  $model->getKeyName();
+			
+			$this->rowCount = $countCollection
+				->distinct($distinctCountColumn)
+				->count($distinctCountColumn);	
 		} else {
 			$this->rowCount = 0;
-		}
-		
+		}		
 
 		/* SORTING */
 	
