@@ -177,7 +177,7 @@
 			return null;			
 		}
 
-		private function getCellValue($obj) {
+		private function getCellValue($obj, $asHTML = true) {
 			if(!is_object($obj))
 				return null;
 
@@ -236,7 +236,14 @@
 						$value = number_format((float)$value, 2, ",", ".");
 						break;
 					case("bool"):
-						$value = '<span class="glyphicon glyphicon-' . ($value ? 'ok' : 'remove') . '"></span>';
+						if($asHTML) {
+							$value = '<span class="glyphicon glyphicon-' . ($value ? 'ok' : 'remove') . '"></span>';	
+						} else {
+							$value = $value ? 
+								oTablesFrameworkHelperController::translate('labels.yes') : 
+								oTablesFrameworkHelperController::translate('labels.no');
+						}
+						
 						break;
 					case("flag"):
 						if ($value)
@@ -344,7 +351,7 @@
 
 				$this->filters = array();
 			}
-			return $this->getCellValue($obj);
+			return $this->getCellValue($obj, false);
 		}
 
 		public function render($obj) {
