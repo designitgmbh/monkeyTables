@@ -197,6 +197,9 @@
 			if($this->type == "number")
 				return "number";
 
+			if($this->type == "decimal")
+				return "decimal";
+
 			if($this->type == "currency")
 				return "currency";
 
