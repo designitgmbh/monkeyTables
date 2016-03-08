@@ -182,8 +182,8 @@ class oTablesFrameworkDBController
 				$column->setFilterValues($values);
 
 				return;	
-			}				
-		}	
+			}
+		}
 
 		$cacheName = 'monkeyTablesColumnFilterValues::' . $hash;
 		$values = Cache::remember($cacheName, 120, function() use ($column, $columnKey, $hash) {
@@ -317,19 +317,31 @@ class oTablesFrameworkDBController
 					$values = [$value];
 				}
 
-				$collection = $collection->where(function($query) use ($fieldName, $values, $compare) {
-					if(!is_array($values))
-					{
-							$value=$values;
-							$this->filteringComparision($query, $fieldName, $value, $compare);
+				if(!is_array($values)) {
+					$values = [$values];
+				}
 
+				$collection = $collection->where(function ($query) use (
+					$DBColumn, 
+					$collection, 
+					$fieldName, 
+					$values, 
+					$compare
+				) {
+					$having = [];
+					$needsHaving = $DBColumn->needsHaving();
+
+					foreach($values as $value) {
+						if($needsHaving) {
+							$having[] = $this->filteringHavingComparison($query, $fieldName, $value, $compare);
+						} else {
+							$this->filteringWhereComparison($query, $fieldName, $value, $compare);
+						}
 					}
-					else
-					{
-						foreach($values as $value) {
-							$this->filteringComparision($query, $fieldName, $value, $compare);			
-						}	
-					}
+
+					if(!empty($having)) {
+						$collection->havingRaw(implode(' OR ', $having));
+					}	
 				});							
 			}
 		}
@@ -358,6 +370,10 @@ class oTablesFrameworkDBController
 					$compare 	= "LIKE";
 					$value 		= "LOWER('%" . $filter['value'] . "%')";
 
+					if($DBColumn->needsHaving()) {
+						continue;
+					}
+
 					$collection->orWhere(
 						DB::raw('LOWER( ' . $DBColumn->getFieldName() . ')'),
 						$compare, 
@@ -372,13 +388,13 @@ class oTablesFrameworkDBController
 			$countCollection = clone $collection;
 
 			$distinctCountColumn = $this->groupBy ?: $model->getTable() . "." .  $model->getKeyName();
-			
+
 			$this->rowCount = $countCollection
 				->distinct($distinctCountColumn)
 				->count($distinctCountColumn);	
 		} else {
 			$this->rowCount = 0;
-		}		
+		}
 
 		/* SORTING */
 	
@@ -422,7 +438,7 @@ class oTablesFrameworkDBController
 
 		/* GROUP */
 		if(!$this->groupBy) {
-			$this->groupBy = $model->getKeyName();
+			$this->groupBy = $model->getTable() . "." .  $model->getKeyName();
 		}
 		$collection = $collection->groupBy($this->groupBy);
 
@@ -500,65 +516,92 @@ class oTablesFrameworkDBController
 		return $returnSet;
 	}
 
-	/**
-	 * Compares the values when filtering
-	 * @return void
-	 */
-	protected function filteringComparision($query, $fieldName, $value, $compare)
-	{
-		$funcArr 	= array();
-		$compareArr = array();
-		$valueArr 	= array();
+	private function explodeCompare($compare, $value) {
+		$compares = [];
 
 		switch($compare) {
 			case("between"):
 				$between = explode("|", $value);
 				if($between[0]) {
-					$funcArr[] 		= "where";
-					$compareArr[] 	= ">=";
-					$valueArr[] 	= $between[0];
+					$compares[] = (object)[
+						"function" => "where",
+						"compare" => ">=",
+						"value" => $between[0]
+					];
 				}
 				if($between[1]) {
-					$funcArr[] 		= "where";
-					$compareArr[] 	= "<=";
-					$valueArr[] 	= $between[1];
+					$compares[] = (object)[
+						"function" => "where",
+						"compare" => "<=",
+						"value" => $between[1]
+					];
 				}
+
 				break;
 			case("contains"):
-				$funcArr[] 		= "where";
-				$compareArr[] 	= "LIKE";
-				$valueArr[]		= "%" . $value . "%";
+				$compares[] = (object)[
+					"function" => "where",
+					"compare" => "LIKE",
+					"value" => "%" . $value . "%"
+				];
+
 				break;
 			case("exists"):
 				if($value == "true" || $value === true) {
-					$funcArr[] 	= 'whereNotNull'; 
+					$function 	= 'whereNotNull'; 
 				} else {
-					$funcArr[] 	= 'whereNull'; 
+					$function 	= 'whereNull'; 
 				}
-				$compareArr[] = '';
-				$valueArr[] = '';
+
+				$compares[] = (object)[
+					"function" => $function,
+					"compare" => "",
+					"value" => ""
+				];
 				break;
 			default:
-				$funcArr[] 		= "where";
-				$compareArr[] 	= $compare;
-				$valueArr[] 	= $value;
+				$compares[] = (object)[
+					"function" => "where",
+					"compare" => $compare,
+					"value" => $value
+				];
+
 				break;
 		}
 
-		$query = $query->orWhere(function($subquery) use($fieldName, $value, $compare, $compareArr, $funcArr, $valueArr) {
-			foreach($compareArr as $key => $compare) {
-				$function = $funcArr[$key];
-				$value = $valueArr[$key];
+		return $compares;
+	}
+
+	/**
+	 * Compares the values when filtering
+	 * @return void
+	 */
+	protected function filteringWhereComparison($query, $fieldName, $value, $compare)
+	{
+		$compares = $this->explodeCompare($compare, $value);
+		$query = $query->orWhere(function($subquery) use($fieldName, $compares) {
+			foreach($compares as $compare) {
+				$function = $compare->function;
+				$value = $compare->value;
 
 				$subquery = $subquery->$function(
 					DB::raw("LOWER(" . $fieldName . ")"), 
-					$compare, 
+					$compare->compare,
 					is_numeric($value) ?
 						DB::raw("$value"):
-						DB::raw("LOWER('$value')") 
+						DB::raw("LOWER('$value')")
 				);
 			}
 		});
+	}
+
+	protected function filteringHavingComparison($query, $fieldName, $value, $compare)
+	{
+		return "( LOWER(" . $fieldName . ") " . $compare . " " . 
+			(is_string($value) ? 
+				DB::raw("LOWER('$value')") :
+				$value
+			) . ")";
 	}
 
 	/**
@@ -591,15 +634,13 @@ class oTablesFrameworkDBController
 				if($prefilter["operator"] == 'IN')
 					$prefilter["value"] = DB::raw($prefilter["value"]);
 
-				if($prefilter["type"]=="OR"){
-					$query->where(function($query) use ($prefilter)
-					{
+				if($prefilter["type"] == "OR") {
+					$query->where(function($query) use ($prefilter) {
 						for($i=0; $i<count($prefilter["field"]); $i++) {
 							$query->orWhere($prefilter["field"][$i], $prefilter["operator"][$i], $prefilter["value"][$i]);
 						}
 					});
-				}
-				else{
+				} else {
 					$query->where($prefilter["field"], $prefilter["operator"], $prefilter["value"]);
 				}
 			}
@@ -695,6 +736,38 @@ class oTablesFrameworkDBControllerColumn {
 
 	public function needsSelect() {
 		return $this->needsSelect;
+	}
+
+	public function needsHaving() {
+		if(self::isSQLCmd($this->valueKey)) {
+			// http://dev.mysql.com/doc/refman/5.7/en/group-by-functions.html
+			$sqlAggregateCommands = [
+				"AVG",
+				"BIT_AND",
+				"BIT_OR",
+				"BIT_XOR",
+				"COUNT",
+				"GROUP_CONCAT",
+				"MAX",
+				"MIN",
+				"STD",
+				"STDDEV",
+				"STDDEV_POP",
+				"STDDEV_SAMP",
+				"SUM",
+				"VAR_POP",
+				"VAR_SAMP",
+				"VARIANCE"
+			];
+
+			foreach($sqlAggregateCommands as $aggregateCommand) {
+				if(strpos($this->valueKey, $aggregateCommand) !== false) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	public function getSelectClause() {
@@ -897,12 +970,10 @@ class oTablesFrameworkDBControllerColumn {
 			}
 
 			if($aliasName == $table && $hasAlias) {
-				$aliasName .= md5($this->valueKey);
+				$aliasName .= md5($relationString);
 
 				//replace table name in other key
-				//preg_replace to ensure that it's changed only the name of the corresponding table
-				$key1 = preg_match("!^({$table})\.!im", $key1)? str_replace($table, $aliasName, $key1):$key1;
-				$key2 = preg_match("!^({$table})\.!im", $key2)? str_replace($table, $aliasName, $key2):$key2;
+				$key2 = str_replace($table, $aliasName, $key2);
 			}
 
 			//the first key might need to use an alias name for its table
