@@ -54,6 +54,7 @@ module.exports = function(grunt)
 
         processhtml: {
             options: {
+                recursive: true,
                 process: true,
                 data: {
                   releaseSize: 'xx kB',

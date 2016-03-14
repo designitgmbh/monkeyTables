@@ -5,6 +5,7 @@
         <hr>
       </div>
 
+      <!-- build:remove -->
       <div class="download">
         <p class="marginTop30"><a href="javascript:void(0);" class="btn btn-custom download-btn"><i class="fa fa-arrow-circle-down"></i>Download monkeyTables</a></p> 
         <p class="download-info"><%= releaseSize %> | <%= releaseVersion %> released <%= releaseDate %> <br>supports laravel &amp; lumen </p>
@@ -12,9 +13,10 @@
       </div>
 
       <p> or check:</p>
+      <!-- /build -->
 
       <div class="download">
-        <p class="marginTop15"><a href="javascript:void(0);" class="btn btn-custom download-btn"><i class="fa fa-github"></i>monkeyTables Github</a></p>
+        <p class="marginTop15"><a href="https://github.com/designitgmbh/monkeyTables" class="btn btn-custom download-btn"><i class="fa fa-github"></i>monkeyTables Github</a></p>
         <div class="clearFloat"></div>
       </div>
 
@@ -25,6 +27,10 @@
         <div class="clearFloat"></div>
       </div>
 
+      <h5>Composer</h5>
+      <p>You can install the monkeyTables PHP backend through Composer, a package manager for PHP. Once you have the composer command line tool installed, you can type <code class="language-">$ composer.phar require "designitgmbh/monkey-tables":"dev-master"</code> For any additional information just checkout the gitHub read me!</p>
+
+      <!-- build:remove -->
       <h5>Bower Component</h5>
       <p>You can install monkeyTables through Bower, a package manager for web components. Once you have the bower command line tool installed, you can type <code class="language-">$ bower install monkeytables</code>. You might need to run bower cache clean first to get the latest versions because of a repo switcheroo. </p>
 
@@ -36,7 +42,8 @@
       
       <div class="note">
         <p><span class="note-title">Note:</span> the <code class="language-">//</code> at the beginning of each URL. This causes the files to be fetched over the same protocol as the current page, whether it is <code class="language-">http://</code> or <code class="language-">https://</code>.</p>
-      </div> 
+      </div>
+      <!-- /build -->
 
     </div>
   </section>

@@ -47,12 +47,7 @@
           </div>
           <div class="collapse navbar-collapse" id="navigation">
             <ul class="nav navbar-nav navbar-right" id="nav">
-              <li class="monkey-tables-intro monkey-links active" destination="intro"><a href="javascript:void(0);">Intro</a></li>
-              <li class="monkey-tables-docs monkey-links" destination="docs"><a href="javascript:void(0);">Docs</a></li>
-              <li class="monkey-tables-download monkey-links" destination="download"><a href="javascript:void(0);">Download</a></li>
-              <li class="monkey-tables-support monkey-links" destination="support"><a href="javascript:void(0);">Support</a></li>
-              <li class="monkey-tables-contribute monkey-links" destination="contribute"><a href="javascript:void(0);">Contribute</a></li>
-            </ul>
+              <li class="monkey-tables-intro monkey-links active" destination="intro"><a href="javascript:void(0);">Intro</a></li>              <li class="monkey-tables-download monkey-links" destination="download"><a href="javascript:void(0);">Download</a></li>            </ul>
           </div>
         </div> 
       </header>
@@ -67,18 +62,25 @@
       <div class="title col-md-8 col-sm-10 col-xs-12"> 
         <h1>monkey<strong>Tables</strong></h1>
         <hr>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p>Effectively show, filter and manipulate your data directly from the database</p>
       </div>
-
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>    
+      <p>monkeyTables are a set of PHP and JavaScript libraries with the necessary styling, to provide you with a simple and effective package, that will allow you to create powerful tables directly made from your database. <br />
+      It brings a lot of nice features including:</p>
+      <ul>
+        <li>Automatic filtering</li>
+        <li>Sorting</li>
+        <li>Presets</li>
+        <li>Inline editing</li>
+        <li>Tabbing</li>
+        <li>And much more...</li>
+      </ul>
+      <br />
 
       <img src="images/labs/monkeytables/table.png" alt="monkeyTables" class=""> 
 
       <div class="download">
-        <p class="marginTop30"><a href="javascript:void(0);" class="btn btn-custom download-btn"><i class="fa fa-arrow-circle-down"></i>Download monkeyTables</a></p> 
-        <p class="download-info">
-          xx kB | alpha released 18.11.2015 <br>supports laravel &amp; lumen </p>
-        <div class="clearFloat"></div> 
+        <p class="marginTop15"><a href="https://github.com/designitgmbh/monkeyTables" class="btn btn-custom download-btn"><i class="fa fa-github"></i>monkeyTables Github</a></p>
+        <div class="clearFloat"></div>
       </div>
     </div>
   </section>
@@ -88,47 +90,90 @@
   ****************************************************************************************************************
   demos ************************************************* demos ******************************************** demos
   ****************************************************************************************************************
-   -->     
+   -->
   <section id="demos" class="section marginTop30">
     <div class="container">
       <div class="row">
         <div class="col-md-3 col-sm-3 col-xs-12 optionmenu">
           <div class="MenuLabList dark paddingTop30 paddingBot30">
-            <h4>Demos</h4>
+            <h4>Features</h4>
             <div class="linea marginBot15"></div>
             <ul class="" id="">
-              <li><a href="javascript:void(0);" id="bviews" class="mt-btn active">Basic views</a></li>
-              <li><a href="javascript:void(0);" id="inter" class="mt-btn">Internationalization</a></li>
-              <li><a href="javascript:void(0);" id="srang" class="mt-btn">Selecting ranges</a></li>             
-              <li><a href="javascript:void(0);" id="bevent" class="mt-btn">Background events</a></li>
-              <li><a href="javascript:void(0);" id="jq" class="mt-btn">jQuery UI theme</a></li>
+              <li><a href="javascript:void(0);" id="database" class="mt-btn active">Directly from the Database</a></li>
+              <li><a href="javascript:void(0);" id="filter" class="mt-btn">Filter Data automatically</a></li>
+              <li><a href="javascript:void(0);" id="datatypes" class="mt-btn">Supports different Data Types</a></li>             
+              <li><a href="javascript:void(0);" id="quicksearch" class="mt-btn">Quick Search</a></li>
+              <li><a href="javascript:void(0);" id="presets" class="mt-btn">Presets</a></li>
             </ul>
           </div>
         </div>
         <div class="col-md-9 col-sm-9 col-xs-12 show-demos borderleft entries">
-          <div id="mt-info-bviews" class="mt-info show-mt-info">
-              <h1>Basic Views</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
+          <div id="mt-info-database" class="mt-info show-mt-info">
+              <h1>Directly from the Database</h1>
+              <p>monkeyTables provide you with a convenient interface to fetch all the data directly from the database. Its direct integration with Eloquent allows you to easily use relations defined in the ORM.</p>
+              <p><pre><code class="language-markup">
+$mTable = new mTable;
+$mTable
+    ->setRequest(Request::all())
+    ->source('Project');
+
+$mTable->add(
+    (new mTableColumn("#", "id"))
+)->add(
+    (new mTableColumn("Title", "title"))
+        ->setClickable("/item/{{ID}}", "id")
+)->add(
+    (new mTableColumn("Service", "service->name"))
+        ->setClickable("/service/{{ID}}", "service->id")
+)->add(
+    (new mTableColumn("Destination", "destination->city->name"))
+);
+
+return response()->json($mTable->render());</code></pre></p>
           </div><!-- mt-info -->
-          <div id="mt-info-inter" class="mt-info">
-              <h1>Internationalization</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
+          <div id="mt-info-filter" class="mt-info">
+              <h1>Filter Data automatically</h1>
+              <p>Never worry again about writing extra code to filter your data table for any value. Every column that you add to your table will automatically be filterable.</p>
+
+              <img src="images/labs/monkeytables/filters.png" alt="monkeyTables" width="600" />
           </div><!-- mt-info -->
-          <div id="mt-info-srang" class="mt-info">
-              <h1>Selecting ranges</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio.  Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
+          <div id="mt-info-datatypes" class="mt-info">
+              <h1>Supports different Data Types</h1>
+              <p>Booleans, dates, numbers, strings, ..? No problem for monkeyTables, just set the appropriate type to automatically adjust filters and formatting.</p>
+
+              <p><pre><code class="language-markup">
+$mTable->add(
+    (new mTableColumn("Updated at", "updated_at"))
+      ->setType("date")
+);
+
+$mTable->add(
+    (new mTableColumn("Published", "published"))
+      ->setType("bool")
+);
+
+$mTable->add(
+    (new mTableColumn("Total Sales", "sales_amount"))
+      ->setType("number")
+);
+
+$mTable->add(
+    (new mTableColumn("Revenue", "revenue"))
+      ->setType("currency")
+);
+</code></pre></p>
           </div><!-- mt-info -->
-          <div id="mt-info-bevent" class="mt-info">
-              <h1>Background events</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio torto</p> 
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
+          <div id="mt-info-quicksearch" class="mt-info">
+              <h1>Quick Search</h1>
+              <p>Just want to grab for some specific word or number? Quick search allows you to enter any search term and searches for it in all shown columns.</p>
+
+              <img src="images/labs/monkeytables/quicksearch.png" alt="monkeyTables" />
           </div><!-- mt-info -->
-          <div id="mt-info-jq" class="mt-info">
-              <h1>jQuery UI theme</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada egetauctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus fermentum lacus sed tortor bibendum tincidunt. Sed est quam, sagittis sit amet malesuada eget, finibus ut odio. Donec tincidunt, velit vel viverra sollicitudin, ligula quam lobortis sapien, in pellentesque ex dolor vitae tortor. Aliquam eget dictum ipsum, luctus gravida risus. Donec non volutpat velit. Ut vel congue turpis. Curabitur auctor, mauris id convallis blandit, metus turpis consectetur sem, vel tempor nunc purus sit amet torto</p>
+          <div id="mt-info-presets" class="mt-info">
+              <h1>Presets</h1>
+              <p>Every combination of filters, sorting and even rows per page can be saved into a preset. You can then use this preset at any time to recover your previous modifications. It is possible to make a preset default, so it is loaded every time you open your table. Also you can make presets general, so they are accessible to other users.</p>
+
+              <img src="images/labs/monkeytables/preset.png" alt="monkeyTables" />
           </div><!-- mt-info -->
 
         </div><!-- show-demos -->
@@ -138,6 +183,7 @@
         </div>
         <!-- End Intro -->
 
+        <!-- build:remove -->
         <!-- Start Docs -->
         <div class="monkey-tables-docs monkey-pages collapse">
           ﻿  <section id="monkeytablesDocs" class="section">
@@ -286,6 +332,7 @@
   </section>
         </div>
         <!-- End Docs -->
+        <!-- /build -->
 
         <!-- Start Download -->
         <div class="monkey-tables-download monkey-pages collapse">
@@ -297,15 +344,7 @@
       </div>
 
       <div class="download">
-        <p class="marginTop30"><a href="javascript:void(0);" class="btn btn-custom download-btn"><i class="fa fa-arrow-circle-down"></i>Download monkeyTables</a></p> 
-        <p class="download-info">xx kB | alpha released 18.11.2015 <br>supports laravel &amp; lumen </p>
-        <div class="clearFloat"></div>
-      </div>
-
-      <p> or check:</p>
-
-      <div class="download">
-        <p class="marginTop15"><a href="javascript:void(0);" class="btn btn-custom download-btn"><i class="fa fa-github"></i>monkeyTables Github</a></p>
+        <p class="marginTop15"><a href="https://github.com/designitgmbh/monkeyTables" class="btn btn-custom download-btn"><i class="fa fa-github"></i>monkeyTables Github</a></p>
         <div class="clearFloat"></div>
       </div>
 
@@ -316,18 +355,8 @@
         <div class="clearFloat"></div>
       </div>
 
-      <h5>Bower Component</h5>
-      <p>You can install monkeyTables through Bower, a package manager for web components. Once you have the bower command line tool installed, you can type <code class="language-">$ bower install monkeytables</code>. You might need to run bower cache clean first to get the latest versions because of a repo switcheroo. </p>
-
-      <h5>CDNJS</h5>
-      <p>Nulla sagittis eros eget consectetur sagittis. Donec sed dui quis mi <a href="">molestie venenatis</a>. Nulla nec tortor vel orci efficitur dapibus auctor vel nisl. Donec blandit congue arcu, nec tempor justo faucibus et. Aenean sodales luctus egestas. Morbi ut aliquam nibh. Proin cursus egestas scelerisque. Sed in congue tortor, et luctus sem.</p>
-      <p><pre><code class="language-markup">&lt;!-- URLS --&gt;
-//cdnjs.something.com/ajax/libs/monkeyTables/alpha/monkeyTables.min.js
-//cdnjs.something.com/ajax/libs/monkeyTables/alpha/monkeyTables.min.css</code></pre></p>
-      
-      <div class="note">
-        <p><span class="note-title">Note:</span> the <code class="language-">//</code> at the beginning of each URL. This causes the files to be fetched over the same protocol as the current page, whether it is <code class="language-">http://</code> or <code class="language-">https://</code>.</p>
-      </div> 
+      <h5>Composer</h5>
+      <p>You can install the monkeyTables PHP backend through Composer, a package manager for PHP. Once you have the composer command line tool installed, you can type <code class="language-">$ composer.phar require "designitgmbh/monkey-tables":"dev-master"</code> For any additional information just checkout the gitHub read me!</p>
 
     </div>
   </section>
@@ -335,6 +364,7 @@
         </div>
         <!-- End Download -->
 
+        <!-- build:remove -->
         <!-- Start Support -->
         <div class="monkey-tables-support monkey-pages collapse">
           ﻿  <section id="monkeytablesSupport" class="section">
@@ -463,6 +493,7 @@
   </section>
         </div>
         <!-- End Contribute -->
+        <!-- /build -->
 
       </div><!-- monkeytables -->
 
