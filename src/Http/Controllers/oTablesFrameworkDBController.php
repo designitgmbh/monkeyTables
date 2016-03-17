@@ -970,10 +970,12 @@ class oTablesFrameworkDBControllerColumn {
 			}
 
 			if($aliasName == $table && $hasAlias) {
-				$aliasName .= md5($relationString);
+				$aliasName .= md5($this->valueKey);
 
 				//replace table name in other key
-				$key2 = str_replace($table, $aliasName, $key2);
+				//preg_replace to ensure that it's changed only the name of the corresponding table
+				$key1 = preg_match("!^({$table})\.!im", $key1)? str_replace($table, $aliasName, $key1):$key1;
+				$key2 = preg_match("!^({$table})\.!im", $key2)? str_replace($table, $aliasName, $key2):$key2;
 			}
 
 			//the first key might need to use an alias name for its table
