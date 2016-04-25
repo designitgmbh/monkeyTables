@@ -110,6 +110,18 @@
 					);
 					break;
 
+				case("DATE_DAY"):
+					$this->squashSelect = DB::raw(
+						"CONCAT(
+							DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%d'),
+							'.',
+							DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'),
+							'.',
+							YEAR(FROM_UNIXTIME( $squashField ))
+						) as $xAxisName"
+					);
+					break;
+
 				case("VALUE"):
 					$this->squashSelect = DB::raw(
 						"$squashField as $xAxisName"
@@ -187,6 +199,14 @@
 					if($diff->format('%y') >= 2 && $diff->format('%m') >= 1)
 					{
 						$from = $to->sub(new \DateInterval('P2Y'));
+					}
+
+					break;
+
+				case("DATE_DAY"):
+					if($diff->format('%y') >= 1 && $diff->format('%m') >= 1)
+					{
+						$from = $to->sub(new \DateInterval('P7D'));
 					}
 
 					break;
