@@ -121,6 +121,16 @@
 						) as $xAxisName"
 					);
 					break;
+				
+				case("DATE_WEEKDAY"):
+					$this->squashSelect = DB::raw(
+						"CONCAT(
+							WEEK( FROM_UNIXTIME( $squashField ) ),
+							'/',
+							YEAR(FROM_UNIXTIME( $squashField ))
+						) as $xAxisName"
+					);
+					break;
 
 				case("VALUE"):
 					$this->squashSelect = DB::raw(
@@ -207,6 +217,14 @@
 					if($diff->format('%y') >= 1 && $diff->format('%m') >= 1)
 					{
 						$from = $to->sub(new \DateInterval('P7D'));
+					}
+
+					break;
+
+				case("DATE_WEEKDAY"):
+					if($diff->format('%y') >= 1 && $diff->format('%m') >= 3)
+					{
+						$from = $to->sub(new \DateInterval('P2M'));
 					}
 
 					break;
