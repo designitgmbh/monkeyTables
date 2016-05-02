@@ -224,7 +224,7 @@
 				case("DATE_WEEKDAY"):
 					if($diff->format('%y') >= 1 && $diff->format('%m') >= 3)
 					{
-						$from = $to->sub(new \DateInterval('P2M'));
+						$from = $to->sub(new \DateInterval('P1M'));
 					}
 
 					break;
@@ -299,6 +299,9 @@
 					case("number"):
 					case("currency"):
 						$yValue = (int)$yValue;
+						break;
+					case("float"):
+						$yValue = (float)$yValue;
 						break;
 				}
 				
