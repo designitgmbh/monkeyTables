@@ -222,7 +222,7 @@ class oTablesFrameworkDBController
 			}			
 
 			$query = $query->select([
-				DB::raw($DBColumn->getFieldName() . " as " . $columnKey)
+				DB::raw($DBColumn->getFieldName() . " as `" . $columnKey . "`")
 			]);
 			$query = $query->distinct();
 			
