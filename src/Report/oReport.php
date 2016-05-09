@@ -44,6 +44,7 @@
 		 *
 		 */
 		private
+			$filters = [],
 			$activePresetId,
 			$presetIsModified,
 			$presetCanModify,
