@@ -97,24 +97,21 @@
 			$this->resultsPerPage 	= (intval($this->request['resultsPerPage']) > 0) ? intval($this->request['resultsPerPage']) : 20;
 			$this->skipRows			= $this->page * $this->resultsPerPage;
 
-			//var_dump($this);die("");
-
 			//sorting
 			$this->sorting = (isset($this->request['sorting']) && $this->request['sorting'] != '') ? $this->request['sorting'] : array();
-
-			
 
 			//quickSearch
 			$this->parseQuickSearch(isset($this->request['quickSearch']) ? $this->request['quickSearch'] : array());
 
-	 			//columnArrangement[0]=1&columnArrangement[1]=2&columnArrangement[2]=0&columnArrangement[3]=7&columnArrangement[4]=6&columnArrangement[5]=5&columnArrangement[6]=4&columnArrangement[7]=3
+			if (isset($this->request['trashed'])) {
+				$this->prefilter('!trashed');
+			}
 
 	 		//export type
 	 		$this->exportType = isset($this->request['exportType']) ? $this->request['exportType'] : null;
 	 		$this->exportFilename = isset($this->request['exportFilename']) ? $this->request['exportFilename'] : null;
 
 			//presets
-			//$this->parsePreset(isset($this->request['preset']) ? $this->request['preset'] : array());
 			if($this->presetHandler)
 				$this->handlePreset();
 
