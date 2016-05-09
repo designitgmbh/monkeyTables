@@ -1,6 +1,7 @@
 <?php
 
 namespace Designitgmbh\MonkeyTables\Http\Controllers;
+use Route;
 
 class oTablesFrameworkHelperController extends oDataFrameworkHelperController
 {
@@ -10,7 +11,7 @@ class oTablesFrameworkHelperController extends oDataFrameworkHelperController
 		$modelName = lcfirst(get_class($obj));
 		$routeName = str_replace('_','.',snake_case($modelName));
 
-		if(Route::has($routeName)||Route::has($routeName.".destroy")) 
+		if(Route::has($routeName) || Route::has($routeName.".destroy")) 
 		{
 			$strModel = snake_case($modelName);
 		} 
@@ -31,7 +32,6 @@ class oTablesFrameworkHelperController extends oDataFrameworkHelperController
 				'canDelete' => true
 			),
 			'javascript:void(0)',
-			true,
 			$modalName
 		);
 	}
