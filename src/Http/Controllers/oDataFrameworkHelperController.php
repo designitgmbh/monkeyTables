@@ -3,12 +3,6 @@
 namespace Designitgmbh\MonkeyTables\Http\Controllers;
 
 use Request;
-
-//use App\Models\UserSetting;
-//use App\Models\SystemSetting;
-use Designitgmbh\MonkeySettings\Models\UserSetting;
-use Designitgmbh\MonkeySettings\Models\SystemSetting;
-
 use Designitgmbh\MonkeyTables\Export\WExport;
 
 class oDataFrameworkHelperController extends Controller
@@ -19,34 +13,73 @@ class oDataFrameworkHelperController extends Controller
 	protected $_printViewRoute 			= "oTable.printView";
 	protected $printViewConfigURL		= 'monkeyTables.export.printView.tablesUrl';
 
+	private static function resolveUserSettingClass()
+	{
+		if(class_exists("UserSetting"))
+			$class = "UserSetting";
+		else if(class_exists("App\Models\UserSetting"))
+			$class = "App\Models\UserSetting";
+		else if(class_exists("App\UserSetting"))
+			$class = "App\UserSetting";
+		else
+			$class = "Designitgmbh\MonkeySettings\Models\UserSetting";
+
+		return $class;
+	}
+
 	public static function setSystemUserSetting($settingKey, $settingValue, $userId = 0)
 	{
-		return UserSetting::set($settingKey, $settingValue, $userId);
+		$class = self::resolveUserSettingClass();
+		return $class::set($settingKey, $settingValue, $userId);
 	}
 
 	public static function getSystemUserSetting($settingKey, $userId = 0)
-	{		
-		return UserSetting::get($settingKey, $userId);
+	{
+		$class = self::resolveUserSettingClass();
+		return $class::get($settingKey, $userId);
+	}
+
+	private static function resolveSystemSettingClass()
+	{
+		if(class_exists("SystemSetting"))
+			$class = "SystemSetting";
+		else if(class_exists("App\Models\SystemSetting"))
+			$class = "App\Models\SystemSetting";
+		else if(class_exists("App\SystemSetting"))
+			$class = "App\SystemSetting";
+		else 
+			$class = "Designitgmbh\MonkeySettings\Models\SystemSetting";
+
+		return $class;
 	}
 
 	public static function getGeneralSetting($settingKey) 
 	{
-		return SystemSetting::get($settingKey);
+		$class = self::resolveSystemSettingClass();
+		return $class::get($settingKey);
 	}
 
 	public static function setGeneralSetting($settingKey, $settingValue)
 	{
-		return SystemSetting::set($settingKey, $settingValue);
+		$class = self::resolveSystemSettingClass();
+		return $class::set($settingKey, $settingValue);
 	}
 
 	public static function canModifyGeneralPresets()
 	{
-		/*return WAccessRight::can('manage', 'generalPresets');*/
+		if(method_exists("WAccessRight", "can")) {
+			return WAccessRight::can('manage', 'generalPresets');	
+		}
+
 		return true;
 	}
 
-	public static function translate($string)
+	public static function translate($string, $choice = null)
 	{
+		if($choice !== null) {
+			return trans_choice($string, $choice);
+		}
+
 		return trans($string);
 	}
 
@@ -57,10 +90,12 @@ class oDataFrameworkHelperController extends Controller
 
 	public function sendMail() 
 	{
-		$validator 		= Validator::make(Input::all(), [
-				'userID' => 'required|exists:user,id',
-				'exportType' => 'required|in:pdf,csv',
-				'request' => 'required']);
+		$validator = Validator::make(Input::all(), [
+			'userID' => 'required|exists:user,id',
+			'exportType' => 'required|in:pdf,csv',
+			'request' => 'required'
+		]);
+		
 		if($validator->fails())
 			return Response::json(['status' => 'error', 'message' => $validator->failed()]);
 
