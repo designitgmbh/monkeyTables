@@ -255,7 +255,6 @@ class oTablesFrameworkDBController
 		foreach($DBColumn->getJoinArrayKeys() as $key) {
 			$realTableName 	= $DBColumn->getTableRealName($key);
 			$aliasTableName = $DBColumn->getTableAliasName($key);
-			$fieldName 		= $DBColumn->getFieldName($key);
 			$keysForJoin 	= $DBColumn->getKeysForJoin($key);
 
 			if(!in_array($aliasTableName, $this->joinedTables)) {
@@ -387,7 +386,7 @@ class oTablesFrameworkDBController
 					}
 
 					$collection->orWhere(
-						DB::raw('LOWER( ' . $DBColumn->getFieldName() . ')'),
+						DB::raw('LOWER(' . $DBColumn->getFieldName() . ')'),
 						$compare, 
 						DB::raw($value)
 					);
@@ -400,6 +399,12 @@ class oTablesFrameworkDBController
 			$countCollection = clone $collection;
 
 			$distinctCountColumn = $this->groupBy ?: $model->getTable() . "." .  $model->getKeyName();
+			
+			if(is_array($distinctCountColumn)) {
+				foreach($distinctCountColumn as &$col) {
+					$col = $model->getTable() . "." . $col;
+				}
+			}
 
 			$this->rowCount = $countCollection
 				->distinct($distinctCountColumn)
@@ -907,14 +912,14 @@ class oTablesFrameworkDBControllerColumn {
 		} else {
 			//no join
 			$this->fieldRealName 	= $this->valueKey;
-			$this->fieldName 		= $this->mainTable . "." . $this->valueKey;
+			$this->fieldName 		= "`" . $this->mainTable . "`.`" . $this->valueKey . "`";
 		}
 	}
 
 	private function evalJoinFieldName() {
 		$this->evalKeysForJoin();
 
-		return $this->tableAliasName . "." . $this->fieldRealName;
+		return "`" . $this->tableAliasName . "`.`" . $this->fieldRealName . "`";
 	}
 
 	private function evalKeysForJoin() {
