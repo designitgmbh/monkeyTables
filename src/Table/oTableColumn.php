@@ -286,11 +286,18 @@
 				$option = $filter['option'];
 
 				switch($type) {
+					case("nullable"):
+						if(empty($value)) {
+							$value = oTablesFrameworkHelperController::translate('labels.none');
+						}
+
+						break;
 					case("strip"):
 						if(strlen($value) > $option) {
 							$this->tooltip 	= $value;
 							$value 			= substr($value, 0, $option) . "...";
-						}						
+						}
+
 						break;
 					default:
 						break;
