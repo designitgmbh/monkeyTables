@@ -49,7 +49,7 @@
 		 * @param oReportAxis					$yAxis				The yAxis
 		 */
 		public function __construct($source, $name, $xAxis, $yAxis) {
-			parent::__construct();
+			parent::__construct($name);
 
 			$this->filters = [];
 

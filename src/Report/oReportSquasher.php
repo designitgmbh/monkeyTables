@@ -183,7 +183,7 @@
 			}
 
 			foreach($xValues as $key => $date) {
-				if($date != intval($date))
+				if(!is_numeric($date))
 					$date = strtotime($date);
 
 				$date = (new \DateTime())
