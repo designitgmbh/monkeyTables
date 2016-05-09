@@ -124,7 +124,7 @@ class oTablesFrameworkDBController
 		if($this->rowCount !== false)
 			return $this->rowCount;
 
-		$source = $this->modelNamespace . $this->source;
+		$source = $this->getSource();
         $query = $source::with([]);
 		$this->applyPrejoin($query);
 		$this->applyPrefilter($query);
@@ -137,8 +137,8 @@ class oTablesFrameworkDBController
 		if(isset($this->DBColumns[$hash]))
 			return $this->DBColumns[$hash];
 
-		$source 		= $this->modelNamespace . $this->source;
-		$model 			= new $source;
+		$source 		= $this->getSource();
+		$model 			= $this->getModel();
 		$this->mainTable= $model->getTable();
 
 		$this->DBColumns[$hash] = new oTablesFrameworkDBControllerColumn($source, $model, $this->mainTable, $string);
@@ -147,8 +147,7 @@ class oTablesFrameworkDBController
 	}
 
 	public function getFilterValuesForColumns($columns) {
-		$source 		= $this->modelNamespace . $this->source;
-		$model 			= new $source;
+		$model 			= $this->getModel();
 		$this->mainTable= $model->getTable();
 
 		foreach($columns as $columnKey => $column) {
@@ -156,6 +155,19 @@ class oTablesFrameworkDBController
 		}
 
 		return true;
+	}
+
+	private function getSource() {
+		$source 		= $this->modelNamespace . $this->source;
+		if(!class_exists($source))
+			$source 	= $this->source;
+
+		return $source;
+	}
+
+	private function getModel() {
+		$source = $this->getSource();
+		return new $source;
 	}
 
 	private function setFilterValuesForColumn(&$column, $columnKey) {
@@ -276,9 +288,9 @@ class oTablesFrameworkDBController
 		$resultsPerPage = (isset($filters['resultsPerPage']) ? $filters['resultsPerPage'] : 0);
 
 		$this->resetJoins();
-
-		$source 		= $this->modelNamespace . $this->source;
-		$model 			= new $source;
+		
+		$source 		= $this->getSource();
+		$model 			= $this->getModel();
 		$this->mainTable= $model->getTable();
 		$collection 	= $source::with($this->prefetch);
 
@@ -631,8 +643,16 @@ class oTablesFrameworkDBController
 	protected function applyPrefilter(&$query) {
 		if(count($this->prefilter)>0) {
 			foreach($this->prefilter as $prefilter) {
-				if($prefilter["operator"] == 'IN')
-					$prefilter["value"] = DB::raw($prefilter["value"]);
+
+				if(!isset($prefilter["field"])) {
+					$this->applyAdvancedPrefilter($query, $prefilter);
+					continue;
+				}
+			
+				if ($prefilter["field"] === "!trashed") {
+					$query->onlyTrashed();
+					continue;
+				}
 
 				if($prefilter["type"] == "OR") {
 					$query->where(function($query) use ($prefilter) {
@@ -640,11 +660,49 @@ class oTablesFrameworkDBController
 							$query->orWhere($prefilter["field"][$i], $prefilter["operator"][$i], $prefilter["value"][$i]);
 						}
 					});
-				} else {
-					$query->where($prefilter["field"], $prefilter["operator"], $prefilter["value"]);
+
+					continue;
+				}
+
+				switch ($prefilter["operator"]) {
+					case ('in'):
+					case ('IN'):
+						$query->whereIn($prefilter["field"], $prefilter["value"]);
+						break;
+					case ('null'):
+						$query->whereNull($prefilter["field"]);
+						break;
+					case ('!null'):
+						$query->whereNotNull($prefilter["field"]);
+						break;
+					default: 
+						$query->where($prefilter["field"], $prefilter["operator"], $prefilter["value"]);
+						break;
 				}
 			}
 		}
+	}
+
+	protected function applyAdvancedPrefilter(&$query, $prefilter) {
+		// Each element represents an or condition, which could contain multiple and conditions
+        $query->orWhere(function ($query) use ($prefilter) {
+            foreach ($prefilter as $pf) {
+                if (!is_null($pf["relation"]) && $pf["field"] instanceof Closure) {
+                    // This is a whereHas clause
+                    $query->whereHas($pf["relation"], $pf["field"], $pf["operator"], $pf["value"]);
+                } elseif (is_null($pf['value'])) {
+                    if ($pf['operator'] == '=') {
+                        $query->whereNull($pf["field"]);
+                    } else {
+                        $query->whereNotNull($pf["field"]);
+                    }
+                } elseif ($pf["operator"] == 'in')  {
+                    $query->whereIn($pf["field"], $pf["value"]);
+                } else {
+                    $query->where($pf["field"], $pf["operator"], $pf["value"]);
+                }
+            }
+        });
 	}
 }
 
@@ -908,6 +966,12 @@ class oTablesFrameworkDBControllerColumn {
 			}
 
 			//set relation and keys
+			if(!method_exists($model, $relationString)) {
+				$valueKey = $this->valueKey;
+				$modelClass = get_class($model);
+				throw new \Exception("Error while fetching column for value key '$valueKey'. Relation $relationString could not be fetched from $modelClass. Probably related object does not exist or is morphed.");
+			}
+
 			$relation = $model->$relationString();
 
 			//TODO
@@ -1008,8 +1072,5 @@ class oTablesFrameworkDBControllerColumn {
 		$this->keysForJoin = array($key1, $key2);
 	}
 }
-
-
-
 
 ?>
