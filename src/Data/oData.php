@@ -88,7 +88,7 @@
 			return $this;
 		}
 
-		public function prefilter($field, $operator, $value, $type="") {
+		public function prefilter($field, $operator = "=", $value = 1, $type = "") {
 			array_push($this->prefilter, array(
 					"field" => $field,
 					"operator" => $operator,
