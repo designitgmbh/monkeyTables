@@ -177,6 +177,26 @@
 			return null;			
 		}
 
+		private function parseDate($value, $format = null) {
+			if($format === null) {
+				$format = config('monkeyTables.date.displayDate.php');
+			}
+
+			if($value === oTablesFrameworkHelperController::translate('labels.unset', 1)) {
+				return oTablesFrameworkHelperController::translate('labels.none', 1);
+			}
+
+			if($value != intval($value)) {
+				$value = strtotime($value);
+			}
+
+			if($value) {
+				return date($format, $value);
+			}
+			
+			return "";
+		}
+
 		private function getCellValue($obj, $asHTML = true) {
 			if(!is_object($obj))
 				return null;
@@ -193,44 +213,16 @@
 			if(isset($this->type)) {
 				switch($this->type) {
 					case("shortDate"):
-						if($value != intval($value))
-							$value = strtotime($value);
-
-						if($value)
-							$value = date(config('monkeyTables.date.displayDateShort.php'), $value);
-						else
-							$value = "";
-
+						$value = $this->parseDate($value, config('monkeyTables.date.displayDateShort.php'));
 						break;
 					case("date"):
-						if($value != intval($value))
-							$value = strtotime($value);
-
-						if($value)
-							$value = date(config('monkeyTables.date.displayDate.php'), $value);
-						else
-							$value = "";
-
+						$value = $this->parseDate($value);
 						break;
 					case("datetime"):
-						if($value != intval($value))
-							$value = strtotime($value);
-
-						if($value)
-							$value = date("d.m.Y H:i", $value);
-						else
-							$value = "";
-
+						$value = $this->parseDate($value, "d.m.Y H:i");
 						break;
 					case("time"):
-						if($value != intval($value))
-							$value = strtotime($value);
-
-						if($value)
-							$value = date("H:i", $value);
-						else
-							$value = "";
-
+						$value = $this->parseDate($value, "H:i");
 						break;
 					case("decimal"):
 						$value = number_format((float)$value, 2, ",", ".");
@@ -314,7 +306,9 @@
 		}
 		
 		public function renderHeader() {
-			if($this->type == "toolbox") {
+			$isToolbox = $this->type == "toolbox" || $this->type == "given-toolbox";
+
+			if($isToolbox) {
 				$this->sortable = false;
 				$this->filterable = false;
 			}
@@ -323,7 +317,7 @@
 
 			$cell["CLASS"] = "";
 
-			if($this->type == "toolbox") {
+			if($isToolbox) {
 				$cell["CLASS"] = "toolboxHeader ";
 			}
 			
@@ -345,7 +339,8 @@
 				if(	
 					$this->type == "icon" || 
 					$this->type == "glyphicon" ||
-					$this->type == "toolbox"		)
+					$this->type == "toolbox" ||
+					$this->type == "given-toolbox")
 
 					return "";
 
