@@ -186,7 +186,7 @@
 				return oTablesFrameworkHelperController::translate('labels.none', 1);
 			}
 
-			if($value != intval($value)) {
+			if(!is_numeric($value)) {
 				$value = strtotime($value);
 			}
 
