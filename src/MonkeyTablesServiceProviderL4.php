@@ -21,7 +21,7 @@ class MonkeyTablesServiceProviderL4 extends ServiceProvider
      */
     public function boot()
     {
-        $this->package('designitgmbh/monkeyTables', 'monkeyTables');
+        $this->package('designitgmbh/monkeyTables', 'monkeyTables', __DIR__);
 
         require __DIR__.'/Http/routes.php';
     }
