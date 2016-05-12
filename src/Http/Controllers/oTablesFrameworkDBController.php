@@ -425,7 +425,7 @@ class oTablesFrameworkDBController
 					$this->joinTable($collection, $DBColumn);
 				}
 
-				$collection = $collection->orderBy($DBColumn->getFieldName(), $filters['sorting']['direction']);
+				$collection = $collection->orderBy(DB::raw($DBColumn->getFieldName()), $filters['sorting']['direction']);
 			}		
 		}
 
