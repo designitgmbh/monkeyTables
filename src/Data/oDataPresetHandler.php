@@ -200,7 +200,7 @@
 		}
 		private function saveSetting($setting, $content) {
 			$name = 'oDP-'.$this->oDataId.'_'.$setting;
-			$encodedContent = ($content == null) ? null : json_encode($content);
+			$encodedContent = ($content == null && !is_array($content)) ? null : json_encode($content);
 
 			if($this->isGeneral)
 				$function = "setGeneralSetting";
