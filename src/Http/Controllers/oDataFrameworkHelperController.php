@@ -68,7 +68,7 @@ class oDataFrameworkHelperController extends Controller
 	public static function canModifyGeneralPresets()
 	{
 		if(method_exists("WAccessRight", "can")) {
-			return WAccessRight::can('manage', 'generalPresets');	
+			return \WAccessRight::can('manage', 'generalPresets');	
 		}
 
 		return true;
