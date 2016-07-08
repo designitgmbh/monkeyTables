@@ -623,10 +623,7 @@ class oTablesFrameworkDBController
     protected function filteringHavingComparison($query, $fieldName, $value, $compare)
     {
         return "( LOWER(" . $fieldName . ") " . $compare . " " . 
-            (is_string($value) ? 
-                DB::raw("LOWER('$value')") :
-                $value
-            ) . ")";
+            $this->transformValueForFiter($value) . ")";
     }
 
     /**
