@@ -9,6 +9,13 @@
 
 return 
 [
+	'general' => 
+	[
+		'dataSet' => [
+			'requireName' => false
+		]
+	],
+	
 	'export' => 
 	[
 		'cookie' => '_sid',

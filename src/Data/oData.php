@@ -67,6 +67,10 @@
 
 			$this->presetHandler = null;
 			$this->select = null;
+
+			if(empty($name) && config('monkeyTables.general.dataSet.requireName')) {
+				throw new \Exception("It is not possible to create data sets without name per configuration. Please ensure that your call to oTable or oReport includes a unique name parameter.");
+			}
 		}
 
 		//setter
@@ -88,7 +92,7 @@
 			return $this;
 		}
 
-		public function prefilter($field, $operator = "=", $value = 1, $type = "") {
+		public function prefilter($field, $operator = "=", $value = "1", $type = "") {
 			array_push($this->prefilter, array(
 					"field" => $field,
 					"operator" => $operator,
