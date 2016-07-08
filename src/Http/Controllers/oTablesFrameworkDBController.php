@@ -589,6 +589,17 @@ class oTablesFrameworkDBController
 		return $compares;
 	}
 
+    protected function transformValueForFiter($value)
+    {
+        if(is_numeric($value)) {
+            return DB::raw("$value");
+        } else if (is_bool($value)) {
+            return DB::raw($value ? 1 : 0);
+        }
+
+        return DB::raw("LOWER('$value')");
+    }
+
 	/**
 	 * Compares the values when filtering
 	 * @return void
@@ -599,14 +610,11 @@ class oTablesFrameworkDBController
 		$query = $query->orWhere(function($subquery) use($fieldName, $compares) {
 			foreach($compares as $compare) {
 				$function = $compare->function;
-				$value = $compare->value;
 
 				$subquery = $subquery->$function(
 					DB::raw("LOWER(" . $fieldName . ")"), 
 					$compare->compare,
-					is_numeric($value) ?
-						DB::raw("$value"):
-						DB::raw("LOWER('$value')")
+					$this->transformValueForFiter($compare->value)
 				);
 			}
 		});
