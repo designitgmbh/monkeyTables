@@ -3,7 +3,7 @@
 
 	use Designitgmbh\MonkeyTables\Data\oDataPresetHandler;
 
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
 
 	/**
@@ -240,7 +240,7 @@
 		 * @return array
 		 */
 		public function render() {
-			$this->DBController 	= new oTablesFrameworkDBController;
+			$this->DBController 	= new QueryBuilder;
 			$this->helpController 	= new oDataFrameworkHelperController;
 
 			$output 		= [];

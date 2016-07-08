@@ -2,7 +2,7 @@
 	namespace Designitgmbh\MonkeyTables\Table;
 
 	use Designitgmbh\MonkeyTables\Data\oDataChain;
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
 
 	use Designitgmbh\MonkeyTables\Format\Currency;
@@ -159,7 +159,7 @@
 		private function getCellLink($obj) {
 			if(is_string($this->href) && !empty($this->href)) {
 				if (is_string($this->linkValueKey) && !empty($this->linkValueKey)) {
-					$value = oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->linkValueKey);
+					$value = QueryBuilder::recursiveObjectGetter($obj, $this->linkValueKey);
 					if (is_callable($this->linkValueCallback)) {
 						$value = call_user_func($this->linkValueCallback, $value, $obj);
 						if (is_null($value)) {
@@ -201,7 +201,7 @@
 			if(!is_object($obj))
 				return null;
 
-			$value = oTablesFrameworkDBController::recursiveObjectGetter($obj, $this->valueKey);
+			$value = QueryBuilder::recursiveObjectGetter($obj, $this->valueKey);
 
 			//callback
 			if(isset($this->alterDisplayValueFunc)) {
@@ -383,13 +383,13 @@
 				if(is_array($arguments)) {
 					foreach ($arguments as $key => $argument) {
 						if(is_string($argument)) {
-							$arguments[$key] = oTablesFrameworkDBController::recursiveObjectGetter($obj, $argument);
+							$arguments[$key] = QueryBuilder::recursiveObjectGetter($obj, $argument);
 						} else if(is_array($argument)) {
 							$arguments[$key] = $argument['value'];
 						}
 					}
 				} else {
-					$arguments = oTablesFrameworkDBController::recursiveObjectGetter($obj, $arguments);
+					$arguments = QueryBuilder::recursiveObjectGetter($obj, $arguments);
 				}
 
 				$cell["EDITABLE"] = $this->frameworkHelper->getRoute($this->editable["route"], $arguments);

@@ -1,7 +1,7 @@
 <?php
 	namespace Designitgmbh\MonkeyTables\Table;
 
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
 
 	/**
 	 * Extending oTable to support hierarchies
@@ -101,7 +101,7 @@
 
 		private function getDataSetForSubLevel($obj, $level)
 		{
-			return oTablesFrameworkDBController::recursiveObjectGetter($obj, $level);
+			return QueryBuilder::recursiveObjectGetter($obj, $level);
 		}
 
 		private function renderLevelRow($obj, $tableOptions, $level) 

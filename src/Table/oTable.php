@@ -2,7 +2,7 @@
 	namespace Designitgmbh\MonkeyTables\Table;
 	use Designitgmbh\MonkeyTables\Data\oData;
 
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
 	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
 
 	/**
@@ -107,9 +107,9 @@
 				$this->prefilter('!trashed');
 			}
 
-	 		//export type
-	 		$this->exportType = isset($this->request['exportType']) ? $this->request['exportType'] : null;
-	 		$this->exportFilename = isset($this->request['exportFilename']) ? $this->request['exportFilename'] : null;
+			//export type
+			$this->exportType = isset($this->request['exportType']) ? $this->request['exportType'] : null;
+			$this->exportFilename = isset($this->request['exportFilename']) ? $this->request['exportFilename'] : null;
 
 			//presets
 			if($this->presetHandler)
@@ -467,12 +467,12 @@
 				$filename = "export";
 
 			header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment; filename='.$filename.'.slk');
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Pragma: public');
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment; filename='.$filename.'.slk');
+			header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
 			echo utf8_encode($sylkFileContent);
 			die("");
 		}
@@ -495,12 +495,12 @@
 				$filename = "export";
 
 			header('Content-Description: File Transfer');
-            header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment; filename='.$filename.'.csv');
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Pragma: public');
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment; filename='.$filename.'.csv');
+			header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
 			echo utf8_decode($csv);
 			die("");
 		}
@@ -518,7 +518,7 @@
 		}
 
 		public function render() {
-			$this->DBController 	= new oTablesFrameworkDBController;
+			$this->DBController 	= new QueryBuilder;
 			$this->helpController 	= new oTablesFrameworkHelperController;
 
 			//assign helpController to all columns

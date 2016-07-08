@@ -3,7 +3,7 @@
 
 	use Designitgmbh\MonkeyTables\Data\oDataChain;
 
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkDBController;
+	use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
 
 	/**
 	 * An axis for a series. It contains the label and the valueKey (link to value key.. -> The valueKey is the column name of the entity or a eloquent valueKey... ).
@@ -200,6 +200,6 @@
 		public function render($obj) {
 			$valueKey = isset($this->renderValueKey) ? $this->renderValueKey : $this->valueKey;
 
-			return oTablesFrameworkDBController::recursiveObjectGetter($obj, $valueKey);
+			return QueryBuilder::recursiveObjectGetter($obj, $valueKey);
 		}
 	}
