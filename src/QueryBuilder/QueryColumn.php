@@ -8,7 +8,6 @@ class QueryColumn {
 
     private $isFetchable;
 
-    private $source;
     private $model;
     private $mainTable;
     private $valueKey;
@@ -25,8 +24,7 @@ class QueryColumn {
 
     private $isRelatedTable = null;
 
-    public function __construct($source, $model, $mainTable, $valueKey) {
-        $this->source       = $source;
+    public function __construct($model, $mainTable, $valueKey) {
         $this->model        = $model;
         $this->mainTable    = $mainTable;
         $this->valueKey     = $valueKey;
@@ -264,48 +262,18 @@ class QueryColumn {
                 $relationString = str_replace("|", "", $relationString);
             }
 
-            //set relation and keys
-            if(!method_exists($model, $relationString)) {
-                $valueKey = $this->valueKey;
-                $modelClass = get_class($model);
-                throw new \Exception("Error while fetching column for value key '$valueKey'. Relation $relationString could not be fetched from $modelClass. Probably related object does not exist or is morphed.");
+            try {
+                $relationKeys = $model->getRelationKeysFor($relationString, $hasWhereClause);
+                $model = $model->getRelatedModelFor($relationString);    
+            } catch(Exception $e) {
+                throw new \Exception("Error while fetching column for value key '$valueKey'. " . $e->getMessage());
             }
 
-            $relation = $model->$relationString();
-
-            //TODO
-                //change this, so that key1 & key2 are selected based on relation type
-                //see the "hasOne" comment a bit down
-            if($hasWhereClause) {
-                $key1 = $relation->getForeignKey();
-
-                if(method_exists($relation, "getQualifiedParentKeyName")) {
-                    $key2 = $relation->getQualifiedParentKeyName();
-                } else if(method_exists($relation, "getOtherKey")) {
-                    $key2 = $relation->getOtherKey();
-                } else {
-                    return "ERROR GETTING SECOND KEY";
-                }
-
-            } else {
-                if(method_exists($relation, "getQualifiedForeignKey") && method_exists($relation, "getQualifiedOtherKeyName")) {
-                    $key1 = $relation->getQualifiedForeignKey();    
-                    $key2 = $relation->getQualifiedOtherKeyName();
-                } else {
-                    //this works for "hasOne" relations...if it is not a "hasOne" relation, it might not!
-                        //in case ever other relations will be used here, we need to "if-else" them and execute the appropriate functions to get the keys
-                        //see API:
-                        // http://laravel.com/api/4.2/Illuminate/Database/Eloquent/Relations.html
-                        // http://laravel.com/api/4.2/Illuminate/Database/Eloquent/Relations/HasOne.html
-                    $key1 = $relation->getForeignKey();
-                    $key2 = $relation->getQualifiedParentKeyName();
-                }
-            }
-
-            //set tableName and alias
-            $table      = $relation->getRelated()->getTable();
-            $model      = $relation->getRelated();
-            $aliasName  = $table;
+            $key1 = $relationKeys->key1;
+            $key2 = $relationKeys->key2;
+            
+            $table = $model->getTableName();
+            $aliasName = $table;
 
             if($table == $this->mainTable) {
                 $aliasName      = "!!!!mainTable!!!!";

@@ -11,10 +11,9 @@ class QueryColumnFactoryStorage
         $table = null,
         $columns = [];
 
-    static public function prepare($source, $model) {
-        self::$source = $source;
+    static public function prepare($model) {
         self::$model = $model;
-        self::$table = $model->getTable();
+        self::$table = $model->getTableName();
 
         self::$columns = [];
     }
@@ -24,7 +23,6 @@ class QueryColumnFactoryStorage
 
         if(!isset(self::$columns[$hash])) {
             self::$columns[$hash] = new QueryColumn(
-                self::$source, 
                 self::$model, 
                 self::$table, 
                 $valueKey

@@ -8,8 +8,6 @@ class QueryBuilder
 {
     protected $source;
 
-    protected $modelNamespace = "App\\Models\\";
-
     private 
         $select = [],
         $statement = null;
@@ -88,7 +86,7 @@ class QueryBuilder
 
         $this->needsRowCount = true;
 
-        QueryColumnFactoryStorage::prepare($this->getSource(), $this->getModel());
+        QueryColumnFactoryStorage::prepare($this->getModel());
     }
 
     public function setNeedsRowCount($needsRowCount) {
@@ -124,19 +122,16 @@ class QueryBuilder
         if($this->rowCount !== false)
             return $this->rowCount;
 
-        $source = $this->getSource();
-        $query = $source::with([]);
+        $query = QueryBuilder::fromModel($this->getModel());
+
         $this->applyPrejoin($query);
         $this->applyPrefilter($query);
         return $query->count();
     }
 
     public function getFilterValuesForColumns($columns) {
-        $model          = $this->getModel();
-        $this->mainTable= $model->getTable();
-
         foreach($columns as $columnKey => $column) {
-            $this->setFilterValuesForColumn($column, $columnKey);
+            $this->setFilterValuesForColumn($column);
         }
 
         return true;
@@ -151,11 +146,10 @@ class QueryBuilder
     }
 
     private function getModel() {
-        $source = $this->getSource();
-        return new $source;
+        return ModelFactory::fromSource($this->source);
     }
 
-    private function setFilterValuesForColumn(&$column, $columnKey) {
+    private function setFilterValuesForColumn(&$column) {
         //early return checks
         if(!$column->hasAutoFilterValues()) {
             $column->setFilterValues([]);
@@ -167,7 +161,7 @@ class QueryBuilder
         }
 
         //the cache hash
-        $hash = md5($column->valueKey . $this->modelNamespace . $this->source);
+        $hash = md5($column->valueKey . $this->source);
 
         if($this->usePreparedStatement) {
             //we are reusing prepared statements, so we can
@@ -183,7 +177,7 @@ class QueryBuilder
         }
 
         $cacheName = 'monkeyTablesColumnFilterValues::' . $hash;
-        $values = Cache::remember($cacheName, 120, function() use ($column, $columnKey, $hash) {
+        $values = Cache::remember($cacheName, 120, function() use ($column, $hash) {
             $queryColumn = QueryColumnFactoryStorage::byValueKey($column->valueKey);
 
             if(!$queryColumn->isFetchable()) {
@@ -194,7 +188,8 @@ class QueryBuilder
                 return;
             }
 
-            $query = Query::fromTable($this->mainTable);
+            $query = Query::fromModel($this->getModel());
+            $columnKey = '___COLUMN_KEY___';
 
             $query->select(DB::raw($queryColumn->getFieldName() . " as `" . $columnKey . "`"));
             $query->getQuery()->distinct();
@@ -209,6 +204,8 @@ class QueryBuilder
             }
 
             $query->take(100);
+            $query->prepare();
+            
             $result = $query->get();
 
             $values = array();
@@ -230,7 +227,7 @@ class QueryBuilder
     }
 
     public function getRows($filters) {
-        $query = Query::fromSourceModel($this->getSource(), $this->getModel());
+        $query = Query::fromModel($this->getModel());
         $query->prefetch($this->prefetch);
 
         $this->applyPrejoin($query);

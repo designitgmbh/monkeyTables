@@ -25,11 +25,11 @@ class Query
         return new Query(DB::table($table), $table, '');
     }
 
-    public static function fromSourceModel($source, $model) {
-        $modelTable = $model->getTable();
+    public static function fromModel($model) {
+        $modelTable = $model->getTableName();
         $modelKeyName = $model->getKeyName();
 
-        $query = $source::with([]);
+        $query = BuilderFactory::fromModel($model);
 
         return new Query($query, $modelTable, $modelKeyName);
     }
@@ -42,7 +42,6 @@ class Query
         $this->queryStatus = (object)[
             "isSelected" => false,
             "isFiltered" => false,
-            "isJoined" => false,
             "isGrouped" => false
         ];
     }
@@ -122,10 +121,6 @@ class Query
     }
 
     private function doJoin() {
-        if($this->queryStatus->isJoined) {
-            return $this;
-        }
-
         foreach($this->join as $aliasTableName => $join) {
             $valueKey = $join->valueKey;
             $joinKey = $join->joinKey;
@@ -158,7 +153,7 @@ class Query
             }
         }
 
-        $this->queryStatus->isJoined = true;
+        $this->join = [];
 
         return $this;
     }
@@ -307,9 +302,6 @@ class Query
             ->doGroupBy();
 
         $returnSet = null;
-
-        // print_r($this->query->toSql());
-        // dd(1);
 
         try {
             $returnSet = $this->query->get();
