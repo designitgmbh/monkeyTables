@@ -189,15 +189,13 @@
 
 			$this->prepareDBController();
 
-			if($this->dataSet->isEmpty())
-				return null;
-
-			oReportSquasher::squash($this->dataSet, $this->xAxis);
-			oReportJoiner::join($this->dataSet, $this->yAxis, $this->joinMethod);
+			if(!$this->dataSet->isEmpty()) {
+                oReportSquasher::squash($this->dataSet, $this->xAxis);
+                oReportJoiner::join($this->dataSet, $this->yAxis, $this->joinMethod);    
+            }
 			
 			$this->createHeader();
-
-			//return
+            
 			return $this->createSeriesReturnObject();
 		}
 	}

@@ -338,6 +338,13 @@
 				$this->fillUpSerie($serie);
 			}
 
+            if(empty($series)) {
+                $series[0] = [
+                    "header" => $header,
+                    "data" => []
+                ];
+            }
+
 			return array_values($series);
 		}
 	}
