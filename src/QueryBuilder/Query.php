@@ -40,6 +40,7 @@ class Query
         $this->modelKeyName = $modelKeyName;
 
         $this->queryStatus = (object)[
+            "joinedTables" => [],
             "isSelected" => false,
             "isFiltered" => false,
             "isGrouped" => false
@@ -122,6 +123,9 @@ class Query
 
     private function doJoin() {
         foreach($this->join as $aliasTableName => $join) {
+            if(array_key_exists($aliasTableName, $this->queryStatus->joinedTables))
+                continue;
+
             $valueKey = $join->valueKey;
             $joinKey = $join->joinKey;
 
@@ -151,6 +155,8 @@ class Query
                     $keysForJoin[0], "=", $keysForJoin[1]
                 );
             }
+
+            $this->queryStatus->joinedTables[$aliasTableName] = true;
         }
 
         $this->join = [];
