@@ -10,34 +10,16 @@
      */
     class oTableAdvanced extends oTable
     {
-        public function prefilter($field, $operator, $value, $relation = null, $boolOp = 'and') {
-            if ($boolOp === 'and') {
-                if (empty($this->prefilter)) {
-                    array_push($this->prefilter, []);
-                }
-                array_push($this->prefilter[count($this->prefilter) - 1], [
-                        "field" => $field,
-                        "operator" => $operator,
-                        "value" => $value,
-                        "relation" => $relation
-                    ]
-                );
-            } elseif ($boolOp === 'or') {
-                array_push($this->prefilter, [
-                    [
-                        "field" => $field,
-                        "operator" => $operator,
-                        "value" => $value,
-                        "relation" => $relation
-                    ]
-                ]);
-            } else {
-                throw new Exception('Invalid boolean operation');
-            }
-            return $this;
-        }
-
         public function orPrefilter($field, $operator, $value, $relation = null) {
-            return $this->prefilter($field, $operator, $value, $relation, 'or');
+
+            array_push($this->prefilter, [
+                [
+                    "field" => $field,
+                    "operator" => $operator,
+                    "value" => $value,
+                    "relation" => $relation
+                ]
+            ]);
+            return $this;
         }
     }

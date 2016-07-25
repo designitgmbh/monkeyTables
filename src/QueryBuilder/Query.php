@@ -219,8 +219,21 @@ class Query
     }
 
     public function groupBy($groupBy = null) {
-        $this->groupBy = $groupBy ?: 
-            ( $this->modelTable . "." .  $this->modelKeyName );
+        if($groupBy) {
+            $this->groupBy = $groupBy;
+
+            return;
+        }
+
+        if(is_array($this->modelKeyName)) {
+            $this->groupBy = array_map(function($key) {
+                return $this->modelTable . "." . $key;
+            });
+
+            return;
+        }
+
+        $this->groupBy = $this->modelTable . "." . $this->modelKeyName;
     }
 
     private function doGroupBy() {
