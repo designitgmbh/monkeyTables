@@ -242,14 +242,19 @@
 
 		protected function createSortingFilters(&$filters) {
 			if($this->sorting) {
-				$column = $this->columns[$this->sorting['column']];
-				if($column->isSortable()) {
-					$sorting = [
-						"valueKey" => $column->getValueKey(),
-						"direction"=> $this->sorting['direction']
-					];
-					$filters['sorting'] = $sorting;	
-				}
+				$columnNumber = $this->sorting['column'];
+
+                if(isset($this->columns[$columnNumber])) {
+                    $column = $this->columns[$columnNumber];
+
+                    if($column->isSortable()) {
+                        $sorting = [
+                            "valueKey" => $column->getValueKey(),
+                            "direction"=> $this->sorting['direction']
+                        ];
+                        $filters['sorting'] = $sorting; 
+                    }
+                }
 			}
 
 			return $this;
@@ -261,7 +266,12 @@
 			if(isset($this->filter) && is_array($this->filter)) {
 				foreach($this->filter as $filter) {
 					if($filter['value'] != "noFilter") {
-						$column = $this->columns[$filter["column"]];
+						$columnNumber = $filter["column"];
+
+                        if(!isset($this->columns[$columnNumber]))
+                            continue;
+
+						$column = $this->columns[$columnNumber];
 						$filterArray[] = [
 							"valueKey" 	=> $column->getValueKey(),
 							"compare"  	=> $filter['compare'] ? : '=',
