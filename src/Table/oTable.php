@@ -346,15 +346,20 @@
 				}
 			}
 
-			if(is_array($this->columnArrangement) && count($this->columnArrangement) == count($this->columns)) {
+			if(is_array($this->columnArrangement)) {
 				$columns = $this->columns;
 				$this->columns = array();
 				foreach($this->columnArrangement as $key => $value) {
 					if(isset($columns[$value])) {
 						$columns[$value]->setChainNumber($value);
 						array_push($this->columns, $columns[$value]);
+                        unset($columns[$value]);
 					}
 				}
+                foreach($columns as $key => $column) {
+                    $column->setChainNumber($key);
+                    array_push($this->columns, $column);
+                }
 			} else {
 				foreach($this->columns as $key => $column) {
 					$column->setChainNumber($key);
@@ -522,7 +527,13 @@
 
 		// class functions //
 		public function add($column) {
-			$this->columns[] = $column;
+            $id = $column->getUniqueIdentifier();
+
+            if(isset($this->columns[$id])) {
+                throw new \Exception("Column with value key '{$column->getValueKey()}' already exists. Please change value key, and make sure you do not create duplicate columns. Maybe you tried to change the content of the column with the alterDisplayValue function, be aware that this can only be used to make small adjustments but must not be used to load different data.");
+            }
+
+			$this->columns[$id] = $column;
 
 			return $this;
 		}

@@ -179,7 +179,7 @@ class QueryColumn {
 
     private function evalFieldName() {
         //Check if is Model Function
-        if( strpos($this->valueKey,"()") ) {
+        if(strpos($this->valueKey, "()") || strpos($this->valueKey, '#') === 0) {
             $this->isFetchable = false;
             return false;
         }
@@ -197,7 +197,7 @@ class QueryColumn {
         }
 
         //Check if is Relation
-        if( strpos($this->valueKey,"->") ) {
+        if(strpos($this->valueKey, "->")) {
             //join
             $this->needsJoin = true;
             $this->fieldName = $this->evalJoinFieldName();

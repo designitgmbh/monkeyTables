@@ -164,6 +164,10 @@
 			return $this->chainNumber;
 		}
 
+        public function getUniqueIdentifier() {
+            return md5($this->valueKey);
+        }
+
 		public function hasAutoFilterValues() {
 			return (isset($this->hasAutoFilterValues) && $this->hasAutoFilterValues);
 		}
