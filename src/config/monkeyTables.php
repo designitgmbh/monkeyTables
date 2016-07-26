@@ -66,5 +66,10 @@ return
 	    [
 	    	'php' => 'Y-m-d H:i:s'
 	    ]	
-	]
+	],
+
+    'format' =>
+    [
+        'currency_symbol_prepend' => true
+    ]
 ];

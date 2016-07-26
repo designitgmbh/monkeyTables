@@ -138,7 +138,7 @@
 			return $this;
 		}
 
-		public function setFilter($type, $value) {
+		public function setFilter($type, $value = null) {
 			array_push($this->filters, array(
 					"type" => $type,
 					"option" => $value
@@ -195,6 +195,20 @@
 			}
 			
 			return "";
+		}
+
+		private function parseFloat($value) {
+			if($value === null)
+				return (float)0;
+
+			if(is_numeric($value))
+				return $value;
+
+			$splitValue = array_filter(str_split($value), function($character) {
+				return is_numeric($character) || $character == ',' || $character == '.';
+			});
+			
+			return floatval(implode($splitValue, ''));
 		}
 
 		private function getCellValue($obj, $asHTML = true) {
@@ -269,8 +283,12 @@
 						if(empty($value))
 							$value = "-";
 						break;
+					case("currency-with-symbol"):
+						$value = $this->parseFloat($value);
+						$value = Currency::formatWithSymbol($value);
+						break;
 					case("currency"):
-						$value = (is_null($value) ? 0 : floatval($value));
+						$value = $this->parseFloat($value);
 						$value = Currency::format($value);
 						break;
 					default:
@@ -286,9 +304,19 @@
 				$option = $filter['option'];
 
 				switch($type) {
+					case("not-available"):
+						if(empty($value)) {
+							$value = oTablesFrameworkHelperController::translate('labels.not_available');
+						}
+
+						break;
 					case("nullable"):
 						if(empty($value)) {
-							$value = oTablesFrameworkHelperController::translate('labels.none');
+                            if($option) {
+                                $value = $option;
+                            } else {
+                                $value = oTablesFrameworkHelperController::translate('labels.none');
+                            }						
 						}
 
 						break;
