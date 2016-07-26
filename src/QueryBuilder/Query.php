@@ -228,7 +228,7 @@ class Query
         if(is_array($this->modelKeyName)) {
             $this->groupBy = array_map(function($key) {
                 return $this->modelTable . "." . $key;
-            });
+            }, $this->modelKeyName);
 
             return;
         }
