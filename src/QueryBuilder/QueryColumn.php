@@ -264,6 +264,18 @@ class QueryColumn {
 
             try {
                 $relationKeys = $model->getRelationKeysFor($relationString, $hasWhereClause);
+
+                try {
+                    $morphTypeRelationKeys = $model->getMorphTypeKeysFor($relationString);
+                    $whereClauses[] = [
+                        "field" => $morphTypeRelationKeys->key1,
+                        "operator" => "=",
+                        "value" => $morphTypeRelationKeys->key2
+                    ];
+                } catch(NotMorphRelationException $e) {
+                    //all good, no morph relation, no work
+                }
+
                 $model = $model->getRelatedModelFor($relationString);    
             } catch(Exception $e) {
                 throw new \Exception("Error while fetching column for value key '$valueKey'. " . $e->getMessage());
@@ -316,6 +328,8 @@ class QueryColumn {
             //the second key might need to use an alias name for its table
             $key2Table = strstr($key2, ".", true);
             $key2 = str_replace($key2Table, $this->getAliasForJoinedTable($key2Table), $key2);
+
+            $hasWhereClause = count($whereClauses) > 0;
 
             //save everything in join array
             $this->joinArray[] = array(

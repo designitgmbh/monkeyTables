@@ -1,6 +1,8 @@
 <?php
 namespace Designitgmbh\MonkeyTables\QueryBuilder;
 
+use Illuminate\Database\Eloquent\Relations\MorphOneOrMany as MorphOneOrMany;
+
 class Model
 {
     private 
@@ -37,6 +39,19 @@ class Model
             $this->realTableName = $modelTable;
             $this->asTableName = $modelTable;
         }
+    }
+
+    public function getMorphTypeKeysFor($relationString) {
+        $relation = $this->getRelation($relationString);
+
+        if($relation instanceof MorphOneOrMany) {
+            return (object)[
+                "key1" => str_replace('.', '', strstr($relation->getMorphType(), '.')),
+                "key2" => $relation->getMorphClass()
+            ];
+        } else {
+            throw new NotMorphRelationException();
+        }        
     }
 
     public function getRelationKeysFor($relationString, $hasWhereClause = false) {
