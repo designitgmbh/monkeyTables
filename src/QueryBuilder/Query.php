@@ -296,12 +296,6 @@ class Query
                 ->count();
         }
 
-        if(is_array($distinctCountColumn)) {
-            foreach($distinctCountColumn as &$col) {
-                $col = $this->modelTable . "." . $col;
-            }
-        }
-
         return $this->cloneQuery()
             ->distinct($distinctCountColumn)
             ->count($distinctCountColumn);
