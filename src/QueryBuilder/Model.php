@@ -133,7 +133,7 @@ class Model
         return (new \ReflectionClass($this->model))->getShortName();
     }
 
-    private function getModelClass() {
+    public function getModelClass() {
         return get_class($this->model);
     }
 }
