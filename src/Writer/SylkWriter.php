@@ -47,31 +47,9 @@
 			               '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments including CDATA 
 			); 
 			$string = preg_replace($search, '', $string);
-			$this->replaceUmlaute($string);
+            $string = SylkWriterString::fromUTF8($string);
 
 			return $string;
-		}
-
-		private function replaceUmlaute(&$string) 
-		{
-			$search = [
-				"ä",
-				"ö",
-				"ü",
-				"Ä",
-				"Ö",
-				"Ü",
-			];
-			$replace = [
-				hex2bin("1b")."NHa",
-				hex2bin("1b")."NHo",
-				hex2bin("1b")."NHu",
-				hex2bin("1b")."NHA",
-				hex2bin("1b")."NHO",
-				hex2bin("1b")."NHU"
-			];
-
-			$string = str_replace($search, $replace, $string);
 		}
 
 		public function render() 
@@ -173,83 +151,5 @@
 			}
 
 			return $value;
-		}
-	}
-
-	Class SylkWriterTemplate
-	{
-		public static function fileHeader() 
-		{
-			return 'ID;PWXL;N;E
-P;PGeneral
-P;P0
-P;P0.00
-P;P#,##0
-P;P#,##0.00
-P;P#,##0_);;\(#,##0\)
-P;P#,##0_);;[Red]\(#,##0\)
-P;P#,##0.00_);;\(#,##0.00\)
-P;P#,##0.00_);;[Red]\(#,##0.00\)
-P;P"$"#,##0_);;\("$"#,##0\)
-P;P"$"#,##0_);;[Red]\("$"#,##0\)
-P;P"$"#,##0.00_);;\("$"#,##0.00\)
-P;P"$"#,##0.00_);;[Red]\("$"#,##0.00\)
-P;P0%
-P;P0.00%
-P;P0.00E+00
-P;P##0.0E+0
-P;P#\ ?/?
-P;P#\ ??/??
-P;Pm/d/yyyy
-P;Pd\-mmm\-yy
-P;Pd\-mmm
-P;Pmmm\-yy
-P;Ph:mm\ AM/PM
-P;Ph:mm:ss\ AM/PM
-P;Ph:mm
-P;Ph:mm:ss
-P;Pm/d/yyyy\ h:mm
-P;Pmm:ss
-P;Pmm:ss.0
-P;P@
-P;P[h]:mm:ss
-P;P_("$"* #,##0_);;_("$"* \(#,##0\);;_("$"* "-"_);;_(@_)
-P;P_(* #,##0_);;_(* \(#,##0\);;_(* "-"_);;_(@_)
-P;P_("$"* #,##0.00_);;_("$"* \(#,##0.00\);;_("$"* "-"??_);;_(@_)
-P;P_(* #,##0.00_);;_(* \(#,##0.00\);;_(* "-"??_);;_(@_)
-P;P_-* #,##0.00\ [$'.hex2bin("1b").'(0-407]_-;;\-* #,##0.00\ [$'.hex2bin("1b").'(0-407]_-;;_-* "-"??\ [$'.hex2bin("1b").'(0-407]_-;;_-@_-
-P;FCalibri;M220;L9
-P;FCalibri;M220;L9
-P;FCalibri;M220;L9
-P;FCalibri;M220;L9
-P;ECalibri;M220;L9
-P;ECalibri Light;M360;L55
-P;ECalibri;M300;SB;L55
-P;ECalibri;M260;SB;L55
-P;ECalibri;M220;SB;L55
-P;ECalibri;M220;L18
-P;ECalibri;M220;L21
-P;ECalibri;M220;L61
-P;ECalibri;M220;L63
-P;ECalibri;M220;SB;L64
-P;ECalibri;M220;SB;L53
-P;ECalibri;M220;L53
-P;ECalibri;M220;SB;L10
-P;ECalibri;M220;L11
-P;ECalibri;M220;SI;L24
-P;ECalibri;M220;SB;L9
-P;ECalibri;M220;L10
-P;ESegoe UI;M200;L9
-P;ESegoe UI;M200;SB;L9
-F;P0;DG0G10;M300
-B;Y3;X4;D0 0 2 3
-O;L;D;V0;K47;G100 0.001
-';
-		}
-
-		public static function fileEnd() 
-		{
-			return 'E
-';
 		}
 	}
