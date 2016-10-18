@@ -40,6 +40,14 @@
 			 */
 		 	$header;
 
+        /**
+         * The total count type
+         * This can be used to declare how the data should be counted
+         *
+         * @var integer
+         */
+        protected $totalCountType = self::TOTAL_COUNT_TYPE_NONE;
+
 		/**
 		 * Constructor.
 		 * 
@@ -136,10 +144,6 @@
 				return $this->filters[$number];
 
 			return null;
-		}
-
-		protected function needsRowsCount() {
-			return false;
 		}
 
 		protected function createHeader() {

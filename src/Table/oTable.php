@@ -92,10 +92,13 @@
 				$this->request['page'] = 0;
 			if(!isset($this->request['resultsPerPage']))
 				$this->request['resultsPerPage'] = 0;
+            if(!isset($this->request['paginationType']))
+                $this->request['paginationType'] = 'FULL';
 
 			$this->page 			= (intval($this->request['page']) > 0) ? intval($this->request['page']) : 0;
 			$this->resultsPerPage 	= (intval($this->request['resultsPerPage']) > 0) ? intval($this->request['resultsPerPage']) : 20;
 			$this->skipRows			= $this->page * $this->resultsPerPage;
+            $this->totalCountType   = self::TOTAL_COUNT_TYPE_JSON[$this->request['paginationType']];
 
 			//sorting
 			$this->sorting = (isset($this->request['sorting']) && $this->request['sorting'] != '') ? $this->request['sorting'] : array();
@@ -446,12 +449,17 @@
 				$pages = 0;
 			}
 
+            if($pages === 0) {
+                $this->totalCountType = self::TOTAL_COUNT_TYPE_FULL;
+            }
+
 			$generalInformation = array(
 				"ROWS" => $displayedRowCount,
 				"PAGES" => $pages,
 				"SORTING" => $this->sorting,
 				"RESULTSPERPAGE" => $this->resultsPerPage,
 				"TOTALRESULTS" => $this->rowsCount,
+                "PAGINATIONTYPE" => array_search($this->totalCountType, self::TOTAL_COUNT_TYPE_JSON),
 				"PRESETID" => $this->activePresetId,
 				"PRESETISMODIFIED" => $this->presetIsModified,
 				"PRESETCANMODIFY" => $this->presetCanModify,

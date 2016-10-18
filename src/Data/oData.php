@@ -17,12 +17,31 @@
 		 * @var string
 		 */
 		protected $name;
+
 		/**
 		 * Source of the data set; an entity
 		 * 
 		 * @var string
 		 */
 		protected $source;
+
+        /**
+         * The total count type
+         * This can be used to declare how the data should be counted
+         *
+         * @var integer
+         */
+        protected $totalCountType = self::TOTAL_COUNT_TYPE_FULL;
+
+        const
+            TOTAL_COUNT_TYPE_NONE       = 0,
+            TOTAL_COUNT_TYPE_FULL       = 1,
+            TOTAL_COUNT_TYPE_NEXT_PAGE  = 2,
+            TOTAL_COUNT_TYPE_JSON       = [
+                'NONE'      => 0,
+                'FULL'      => 1,
+                'NEXT_PAGE' => 2
+            ];
 
 		protected
 			/**
@@ -190,8 +209,24 @@
 			return $filters;
 		}
 
-		protected function needsRowsCount() {
-			return true;
+        public function setTotalCountType($totalCountType = self::TOTAL_COUNT_TYPE_FULL)
+        {
+            $this->totalCountType = $totalCountType;
+
+            return $this;
+        }
+
+		public static function needsRowsCount($totalCountType)
+        {
+            switch($totalCountType) {
+                case(self::TOTAL_COUNT_TYPE_NEXT_PAGE):
+                case(self::TOTAL_COUNT_TYPE_NONE):
+                    return false;
+
+                default:
+                case(self::TOTAL_COUNT_TYPE_FULL):
+                    return true;
+            }
 		}
 
 		protected function prepareDBController() {
@@ -204,7 +239,7 @@
 			);
 
 			$this->DBController
-				->setNeedsRowCount($this->needsRowsCount())
+				->setTotalCountType($this->totalCountType)
 				->setSelect($this->select);
 
 			$this->dataSet 		= $this->DBController->getRows($this->createFilters());

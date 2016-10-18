@@ -4,6 +4,8 @@ namespace Designitgmbh\MonkeyTables\QueryBuilder;
 use DB;
 use Cache;
 
+use Designitgmbh\MonkeyTables\Data\oData;
+
 class QueryBuilder
 {
     protected $source;
@@ -89,11 +91,10 @@ class QueryBuilder
         QueryColumnFactoryStorage::prepare($this->getModel());
     }
 
-    public function setNeedsRowCount($needsRowCount) {
-        if($needsRowCount)
-            $this->needsRowCount = true;
-        else
-            $this->needsRowCount = false;
+    public function setTotalCountType($totalCountType)
+    {
+        $this->totalCountType = $totalCountType;
+        $this->needsRowCount = oData::needsRowsCount($this->totalCountType);
 
         return $this;
     }
@@ -116,11 +117,11 @@ class QueryBuilder
     }
 
     public function getRowsCount() {
-        if($this->needsRowCount === false)
-            return 0;
-
         if($this->rowCount !== false)
             return $this->rowCount;
+
+        if($this->needsRowCount === false)
+            return 0;
 
         $query = QueryBuilder::fromModel($this->getModel());
 
@@ -303,6 +304,10 @@ class QueryBuilder
         $skipRows = (isset($filters['skipRows']) ? $filters['skipRows'] : 0);
         $resultsPerPage = (isset($filters['resultsPerPage']) ? $filters['resultsPerPage'] : 0);
 
+        if($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE) {
+            $resultsPerPage++;
+        }
+
         if($skipRows)
             $query->skip($skipRows);
 
@@ -316,10 +321,22 @@ class QueryBuilder
                 $this->statement = new Statement($query);
             }
 
-            return $this->statement->fetchResults($query);
+            $results = $this->statement->fetchResults($query);
         }
 
-        return $query->get();
+        $results = $query->get();
+
+        if($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE) {
+            $fetchedResults = count($results);
+            $fetchedNextPage = $fetchedResults === $resultsPerPage;
+
+            $this->rowCount = $fetchedResults + $skipRows;
+            
+            if($fetchedNextPage)
+                $results->pop();
+        }
+
+        return $results;
     }
 
     /**
