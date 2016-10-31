@@ -223,6 +223,8 @@
 				$value = $func($value, $obj);
 			}
 
+            $originalValue = $value;
+
 			//type
 			if(isset($this->type)) {
 				switch($this->type) {
@@ -305,13 +307,13 @@
 
 				switch($type) {
 					case("not-available"):
-						if(empty($value)) {
+						if(empty($value) || empty($originalValue)) {
 							$value = oTablesFrameworkHelperController::translate('labels.not_available');
 						}
 
 						break;
 					case("nullable"):
-						if(empty($value)) {
+						if(empty($value) || empty($originalValue)) {
                             if($option) {
                                 $value = $option;
                             } else {
