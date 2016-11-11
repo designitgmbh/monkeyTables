@@ -146,7 +146,7 @@
 					$value = str_replace(",", ".", $value);
 					break;
 				default:
-					$value = '"' . $value . '"';
+					$value = '"' . (is_array($value) ?(!$value ? print_r($value, true) :"-"): $value) . '"';
 					break;
 			}
 

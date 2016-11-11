@@ -114,12 +114,8 @@
 							$date = $explodedDate[0];
 						}
 
-						//check if date is timestamp, and add "@"
-						if($date == intval($date))
-							$date = "@" . $date;
-
 						//convert date to timestamp and pass it on
-						$options[$optionKey] = "@" . strtotime($date);
+						$options[$optionKey] = "@" . ($date == intval($date) ? strtotime($date) : $date) ;
 					}
 				}
 			}
