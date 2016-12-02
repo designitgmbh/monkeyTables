@@ -46,10 +46,10 @@
 			               '@<style[^>]*?>.*?</style>@siU',    // Strip style tags properly 
 			               '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments including CDATA 
 			); 
-			$string = preg_replace($search, '', $string);
+			$string = preg_replace($search, '', strip_tags($string));
             $string = SylkWriterString::fromUTF8($string);
 
-			return $string;
+			return trim($string);
 		}
 
 		public function render() 

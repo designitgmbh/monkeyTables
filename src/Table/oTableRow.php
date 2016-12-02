@@ -116,8 +116,8 @@
 			               '@<style[^>]*?>.*?</style>@siU',    // Strip style tags properly 
 			               '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments including CDATA 
 			); 
-			$text = preg_replace($search, '', $document); 
-			return $text; 
+			$text = preg_replace($search, '', strip_tags($document));
+			return trim($text);
 		}
 
 
