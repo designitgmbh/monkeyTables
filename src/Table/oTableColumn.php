@@ -182,7 +182,10 @@
 				$format = config('monkeyTables.date.displayDate.php');
 			}
 
-			if($value === oTablesFrameworkHelperController::translate('labels.unset', 1)) {
+            $isZeroDate = ($value === '0000-00-00' || $value === '0000-00-00 00:00:00');
+            $valueIsUnset = $value === oTablesFrameworkHelperController::translate('labels.unset', 1);
+
+			if($valueIsUnset || $isZeroDate) {
 				return oTablesFrameworkHelperController::translate('labels.none', 1);
 			}
 
