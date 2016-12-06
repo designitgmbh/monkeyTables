@@ -98,7 +98,16 @@ class Model
         $modelClass = $this->getShortModelClass();
         $modelClassSnake = snake_case($modelClass);
 
-        $key = str_replace($modelClassSnake, $this->getTableName(), $key);
+        $tables = explode('.', $key);
+        $column = array_pop($tables);
+
+        foreach($tables as $table) {
+            $table = str_replace($modelClassSnake, $this->getTableName(), $table);    
+        }
+
+        $tables[] = $column;
+
+        $key = implode('.', $tables);
     }
 
     private function handelTableAsKey($key) {
