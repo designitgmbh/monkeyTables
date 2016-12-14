@@ -115,7 +115,7 @@
 						}
 
 						//check if date is timestamp, and add "@"
-						if($date == intval($date))
+						if($date === intval($date))
 							$date = "@" . $date;
 
 						//convert date to timestamp and pass it on
