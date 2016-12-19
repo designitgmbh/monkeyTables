@@ -47,9 +47,9 @@
 			               '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments including CDATA 
 			); 
 			$string = preg_replace($search, '', strip_tags($string));
-            $string = SylkWriterString::fromUTF8($string);
+            $string = SylkWriterString::fromUTF8(trim($string));
 
-			return trim($string);
+			return $string;
 		}
 
 		public function render() 
