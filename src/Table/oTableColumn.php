@@ -288,11 +288,11 @@
 						if(empty($value))
 							$value = "-";
 						break;
-					case("currency-with-symbol"):
+                    case("currency"):
 						$value = $this->parseFloat($value);
 						$value = Currency::formatWithSymbol($value);
 						break;
-					case("currency"):
+					case("currency-without-symbol"):
 						$value = $this->parseFloat($value);
 						$value = Currency::format($value);
 						break;
