@@ -17,7 +17,7 @@
     ],
     "require": {
         "php" : ">=5.3.0",
-        "designitgmbh/monkey-access" : "1.0.1",
+        "designitgmbh/monkey-access" : "1.0.2",
         "designitgmbh/monkey-settings" : "1.0.0"
     },
     "require-dev": {
