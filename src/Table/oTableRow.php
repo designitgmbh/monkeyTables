@@ -33,7 +33,6 @@
 			foreach ($this->columns as $column) {
 				if($column->isEnabled()) {
 					$data = $this->html2txt($column->getHeaderData());
-					$data = str_replace(["\r\n", "\r", "\n"], ' ', $data);
 					$data = str_replace([$dl, $nl], '', $data);
 					$csv .= $data . $dl;
 				}
@@ -49,6 +48,7 @@
 			foreach ($this->columns as $column) {
 				if($column->isEnabled()) {
 					$data = $this->html2txt($column->getData($obj, true));
+					$data = str_replace(["\r\n", "\r", "\n"], ' ', $data);
 					$data = str_replace([$dl, $nl], '', $data);
 					$csv .= $data . $dl;
 				}
