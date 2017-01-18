@@ -154,7 +154,11 @@
 				if($formatFromMinDate)
 					$dateFormated = $dateMin->format($format);
 
-				$dateMin->add($dateInterval);
+				if($dateMin->format('m') == 1){//Case next month is FEB
+						$dateMin->add(new \DateInterval("P28D"));
+				}else{
+						$dateMin->add($dateInterval);
+				}
 
 				if(!$formatFromMinDate)
 					$dateFormated = $dateMin->format($format);
