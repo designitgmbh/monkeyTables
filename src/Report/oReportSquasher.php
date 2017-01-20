@@ -18,7 +18,8 @@
 		 * @param array							$dataSet			The corresponding dataSet the will be squashed. Array of objects.
 		 * @param oReportAxis					$xAxis				The xAxis used for the squash.
 		 */
-		public static function squash(&$dataSet, $xAxis) {
+		public static function squash(&$dataSet, $xAxis)
+        {
 			$xValues = [];
 			foreach($dataSet as $obj) {
 				$xValues[] = $xAxis->render($obj);
@@ -78,7 +79,8 @@
 		}
 
 		/* UNIQUE */
-		private static function squashDefault($xValues, $xObjs) {
+		private static function squashDefault($xValues, $xObjs)
+        {
 			$uniqueValues = [];
 
 			foreach($xValues as $key => $value) {
@@ -95,7 +97,8 @@
 		}
 
 		/* UNIQUE BY COLUMN */
-		private static function squashGroupBy($xValues, $xObjs, $groups) {
+		private static function squashGroupBy($xValues, $xObjs, $groups)
+        {
 			$uniqueValues = [];
 
 			foreach($groups as $group) {
@@ -117,7 +120,8 @@
 		}
 
 		/* DATE SEQ */
-		private static function squashDateSeq($xValues, $xObjs, $limits = null, $format = "Y", $dateInterval = null) {
+		private static function squashDateSeq($xValues, $xObjs, $limits = null, $format = "Y", $dateInterval = null)
+        {
 			if($dateInterval == null) {
 				new \DateInterval("P1Y");
 			}
@@ -154,11 +158,7 @@
 				if($formatFromMinDate)
 					$dateFormated = $dateMin->format($format);
 
-				if($dateMin->format('m') == 1){//Case next month is FEB
-						$dateMin->add(new \DateInterval("P28D"));
-				}else{
-						$dateMin->add($dateInterval);
-				}
+                self::addOrModifyDate($dateMin, $dateInterval);
 
 				if(!$formatFromMinDate)
 					$dateFormated = $dateMin->format($format);
@@ -199,10 +199,10 @@
 
 					if($formatFromMinDate) {
 						if ($month < $businessYearStartMonth)
-							$date->sub($dateInterval);
+                            self::subOrModifyDate($dateMin, $dateInterval);
 					} else {
 						if ($month > $businessYearStartMonth)
-							$date->add($dateInterval);
+                            self::addOrModifyDate($date, $dateInterval);
 					}
 				}
 
@@ -216,17 +216,58 @@
 		}
 
 		/* DATE YEAR SEQ */
-		private static function squashDateYearSeq($xValues, $xObjs, $limits = null) {
-			return self::squashDateSeq($xValues, $xObjs, $limits, "Y", (new \DateInterval("P1Y")));
+		private static function squashDateYearSeq($xValues, $xObjs, $limits = null)
+        {
+			return self::squashDateSeq(
+                $xValues,
+                $xObjs,
+                $limits,
+                "Y",
+                (new \DateInterval("P1Y"))
+            );
 		}
 
 		/* DATE MONTH YEAR SEQ */
-		private static function squashDateMonthYearSeq($xValues, $xObjs, $limits = null) {
-			return self::squashDateSeq($xValues, $xObjs, $limits, "m.Y", (new \DateInterval("P1M")));
+		private static function squashDateMonthYearSeq($xValues, $xObjs, $limits = null)
+        {
+			return self::squashDateSeq(
+                $xValues,
+                $xObjs,
+                $limits,
+                "m.Y",
+                'first day of next month'
+            );
 		}
 
 		/* DATE DAY MONTH YEAR SEQ */
-		private static function squashDateDayMonthYearSeq($xValues, $xObjs, $limits = null) {
-			return self::squashDateSeq($xValues, $xObjs, $limits, Config::get('formats.displayDate.php'), (new \DateInterval("P1D")));
+		private static function squashDateDayMonthYearSeq($xValues, $xObjs, $limits = null)
+        {
+			return self::squashDateSeq(
+                $xValues,
+                $xObjs,
+                $limits,
+                Config::get('formats.displayDate.php'),
+                (new \DateInterval("P1D"))
+            );
 		}
+
+        private static function addOrModifyDate($date, $intervalOrModifier)
+        {
+            if($intervalOrModifier instanceof \DateInterval) {
+                $date->add($intervalOrModifier);
+            } else {
+                $date->modify($intervalOrModifier);
+            }
+        }
+
+        private static function subOrModifyDate($date, $intervalOrModifier)
+        {
+            if($intervalOrModifier instanceof \DateInterval) {
+                $date->sub($intervalOrModifier);
+            } else {
+                $date->modify(
+                    str_replace(['+', 'next'], ['-', 'last'], $intervalOrModifier)
+                );
+            }
+        }
 	}
