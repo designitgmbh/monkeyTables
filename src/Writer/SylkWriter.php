@@ -118,8 +118,12 @@
 			switch($this->columns[$columnIdx]) 
 			{
 				case("currency"):
+                    $value = preg_replace('([^0-9.,])', '', $value);
+
 					$value = str_replace(".", "", $value);
 					$value = str_replace(",", ".", $value);
+
+                    $value = floatval($value);
 					break;
 				case("date"):
 				case("timeline"):

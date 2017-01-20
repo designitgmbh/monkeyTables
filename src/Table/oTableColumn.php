@@ -257,13 +257,13 @@
 						
 						break;
 					case("flag"):
-						if ($value)
+						if ($asHTML)
 						{
-							$value = '<span class="glyphicon glyphicon-ok"></span>';
+							$value = $value ? '<span class="glyphicon glyphicon-ok"></span>' : '<span></span>';
 						}
 						else
 						{
-							$value = '<span></span>';
+							$value = $value ? oTablesFrameworkHelperController::translate('labels.yes') : '';
 						}
 						break;
 					case("switch"):
