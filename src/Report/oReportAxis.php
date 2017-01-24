@@ -115,8 +115,8 @@
 						}
 
 						//check if date is timestamp, and add "@"
-						if($date === intval($date))
-							$date = "@" . $date;
+						if(is_numeric($date))
+							$date = "@" . intval($date);
 
 						//convert date to timestamp and pass it on
 						$options[$optionKey] = "@" . strtotime($date);
