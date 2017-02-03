@@ -222,6 +222,11 @@
 			if($this->type == "suggestion")
 				return "suggestion";
 
+			// fix that when selection was explicitly chosen, it was anyways
+			// defaulting to suggestion (as per the lines below)
+			if($this->type == "selection")
+				return "selection";
+
 			if($this->hasAutoFilterValues()) {
 				return ((count($this->filterValues) > 25) ? "suggestion" : "selection");
 			}
