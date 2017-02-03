@@ -256,6 +256,9 @@
 			if($this->isFilterable()) {
 				$this->prepareFilterValues();
 
+				// sort filter values alphabetically.
+				asort($this->filterValues);
+
 				$cell["FILTERABLE"] = array(
 					"values"		=> $this->filterValues,
 					"type"			=> $this->getAutoFilterType(),
