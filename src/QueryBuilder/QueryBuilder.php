@@ -77,7 +77,7 @@ class QueryBuilder
                     //use condition
                     if ($operator == " in ") {
                         $values = explode(";", $conditionValue);
-                        $join->where($conditionField, "in (" . implode(",", $values) . ") and 1 = ", 1);
+                        $query->where($conditionField, "in (" . implode(",", $values) . ") and 1 = ", 1);
                     } else {
                         $query->where($conditionField, $operator, $conditionValue);
                     }
