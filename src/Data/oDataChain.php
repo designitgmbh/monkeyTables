@@ -1,279 +1,320 @@
 <?php
-	namespace Designitgmbh\MonkeyTables\Data;
-	
-	use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
+    namespace Designitgmbh\MonkeyTables\Data;
+    
+    use Designitgmbh\MonkeyTables\Http\Controllers\oDataFrameworkHelperController;
 
-	/**
-	 * An abstract class that represents a data chain inside of a data set. 
-	 * It contains a label and a valueKey.
-	 * It supports a various amount of options like:
-	 * 		enabled, type, typeOptions, filterable, sortable, alwaysVisible, etc.
-	 *
-	 * @package    MonkeyTables
-	 * @author     Philipp Pajak <p.pajak@design-it.de>
-	 * @license    https://raw.githubusercontent.com/designitgmbh/monkeyTables/master/LICENSE  BSD
-	 */
-	class oDataChain
-	{
-		/**
-		 * Contructor
-		 *
-		 * @param string 		$label 			The label of the dataChain
-		 * @param string 		$valueKey 		The valueKay for the dataChain
-		 */
-		public function __construct($label, $valueKey) {
-			$this->initValues();
+    /**
+     * An abstract class that represents a data chain inside of a data set.
+     * It contains a label and a valueKey.
+     * It supports a various amount of options like:
+     *      enabled, type, typeOptions, filterable, sortable, alwaysVisible, etc.
+     *
+     * @package    MonkeyTables
+     * @author     Philipp Pajak <p.pajak@design-it.de>
+     * @license    https://raw.githubusercontent.com/designitgmbh/monkeyTables/master/LICENSE  BSD
+     */
+class oDataChain
+{
+    /**
+         * Contructor
+         *
+         * @param string        $label          The label of the dataChain
+         * @param string        $valueKey       The valueKay for the dataChain
+         */
+    public function __construct($label, $valueKey)
+    {
+        $this->initValues();
 
-			$this
-			 ->setLabel($label)
-			 ->setValueKey($valueKey);
-		}
+        $this
+         ->setLabel($label)
+         ->setValueKey($valueKey);
+    }
 
-		public function initValues() {
-			$this->label = "";
-			$this->valueKey = "";
+    public function initValues()
+    {
+        $this->label = "";
+        $this->valueKey = "";
 
-			$this->enabled = true;
-			$this->type = null;
-			$this->typeOptions = [];
-			$this->filterable = false;
-			$this->sortable = false;
-			$this->alwaysVisible = false;
-			$this->filterValues = [];
-			$this->chainNumber = false;
-			$this->currentFilterValue = null;
-			$this->currentFilterMethod = null;
-			$this->displayHeader = true;
-		}
+        $this->enabled = true;
+        $this->type = null;
+        $this->typeOptions = [];
+        $this->filterable = false;
+        $this->sortable = false;
+        $this->alwaysVisible = false;
+        $this->filterValues = [];
+        $this->chainNumber = false;
+        $this->currentFilterValue = null;
+        $this->currentFilterMethod = null;
+        $this->displayHeader = true;
+    }
 
-		/* PUBLIC METHODS */
-		//setter
+    /* PUBLIC METHODS */
+    //setter
 
-		public function enable() {
-			$this->enabled = true;
+    public function enable()
+    {
+        $this->enabled = true;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function disable() {
-			$this->enabled = false;
+    public function disable()
+    {
+        $this->enabled = false;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setLabel($label) {
-			$this->label = $label;
+    public function setLabel($label)
+    {
+        $this->label = $label;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setValueKey($valueKey) {
-			$this->valueKey = $valueKey;
+    public function setValueKey($valueKey)
+    {
+        $this->valueKey = $valueKey;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setType($type, $options = []) {
-			$this->type = $type;
-			$this->typeOptions = $options;
+    public function setType($type, $options = [])
+    {
+        $this->type = $type;
+        $this->typeOptions = $options;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setFilterable($filterable) {
-			$this->filterable = $filterable;
+    public function setFilterable($filterable)
+    {
+        $this->filterable = $filterable;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setSortable($sortable) {
-			$this->sortable = $sortable;
+    public function setSortable($sortable)
+    {
+        $this->sortable = $sortable;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setAlwaysVisible($alwaysVisible) {
-			$this->alwaysVisible = $alwaysVisible;
+    public function setAlwaysVisible($alwaysVisible)
+    {
+        $this->alwaysVisible = $alwaysVisible;
 
-			return $this;
-		}
+        return $this;
+    }
 
-		public function setFilterValues($values) {
-			$this->filterValues = $values;
+    public function setFilterValues($values)
+    {
+        $this->filterValues = $values;
 
-			if(count($values) > 0)
-				$this->setHasAutoFilterValues(true);
-
-			return $this;
-		}
-
-		public function setHasAutoFilterValues($value = true) {
-			$this->hasAutoFilterValues = $value;
-
-			return $this;
-		}
-
-		public function setChainNumber($number) {
-			$this->chainNumber = $number;
-
-			return $this;
-		}
-
-		public function setCurrentFilterValue($value) {
-			$this->currentFilterValue = $value;
-
-			return $this;
-		}
-
-		public function setCurrentFilterMethod($method) {
-			$this->currentFilterMethod = $method;
-
-			return $this;
-		}
-
-		//getter
-		public function getLabel() {
-			return $this->label;
-		}
-
-		public function getValueKey() {
-			return $this->valueKey;
-		}
-
-		public function getType() {
-			return $this->type;
-		}
-
-		public function getTypeOptions() {
-			return $this->typeOptions;
-		}
-
-		public function isEnabled() {
-			return $this->enabled;
-		}
-
-		public function isSortable() {
-			return $this->sortable;
-		}
-
-		public function isFilterable() {
-			return $this->filterable;
-		}
-
-		public function getChainNumber() {
-			return $this->chainNumber;
-		}
-
-        public function getUniqueIdentifier() {
-            return md5($this->valueKey);
+        if (count($values) > 0) {
+            $this->setHasAutoFilterValues(true);
         }
 
-		public function hasAutoFilterValues() {
-			return (isset($this->hasAutoFilterValues) && $this->hasAutoFilterValues);
-		}
+        return $this;
+    }
 
-		public function hasFilterValuesAlreadySet() {
-			return (is_array($this->filterValues) && !empty($this->filterValues));
-		}
-		
+    public function setHasAutoFilterValues($value = true)
+    {
+        $this->hasAutoFilterValues = $value;
 
-		/* PRIVATE METHODS */
-		private function prepareFilterValues() {
-			switch($this->type) {
-				case("bool"):
-					$this->filterValues = array(
-												"true"	=>	oDataFrameworkHelperController::translate('labels.yes'),
-												"false"	=>	oDataFrameworkHelperController::translate('labels.no')
-											);
-					break;
-				case("exists"):
-					$this->filterValues = array(
-												"true"	=>	oDataFrameworkHelperController::translate('labels.yes'),
-												"false"	=>	oDataFrameworkHelperController::translate('labels.no')
-											);
-					break;
-				default:
-					break;
-			}
-		}
+        return $this;
+    }
 
-		private function getAutoFilterType() {
-			if($this->type == "number")
-				return "number";
+    public function setChainNumber($number)
+    {
+        $this->chainNumber = $number;
 
-			if($this->type == "decimal")
-				return "decimal";
+        return $this;
+    }
 
-			if($this->type == "currency" || $this->type == "currency-with-symbol")
-				return "currency";
+    public function setCurrentFilterValue($value)
+    {
+        $this->currentFilterValue = $value;
 
-			if($this->type == "date" || $this->type == "timeline")
-				return "date";
+        return $this;
+    }
 
-			if($this->type == "datetime")
-				return "datetime";
+    public function setCurrentFilterMethod($method)
+    {
+        $this->currentFilterMethod = $method;
 
-			if($this->type == "exists")
-				return "exists";
+        return $this;
+    }
 
-			if($this->type == "bool")
-				return "selection";
+    //getter
+    public function getLabel()
+    {
+        return $this->label;
+    }
 
-			if($this->type == "suggestion")
-				return "suggestion";
+    public function getValueKey()
+    {
+        return $this->valueKey;
+    }
 
-			// fix that when selection was explicitly chosen, it was anyways
-			// defaulting to suggestion (as per the lines below)
-			if($this->type == "selection")
-				return "selection";
+    public function getType()
+    {
+        return $this->type;
+    }
 
-			if($this->hasAutoFilterValues()) {
-				return ((count($this->filterValues) > 25) ? "suggestion" : "selection");
-			}
+    public function getTypeOptions()
+    {
+        return $this->typeOptions;
+    }
 
-			return "suggestion";
-		}
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
 
-		private function getCurrentFilter() {
-			return array(
-				"value" 	=> $this->currentFilterValue, 
-				"method" 	=> $this->currentFilterMethod
-			);
-		}
+    public function isSortable()
+    {
+        return $this->sortable;
+    }
 
-		public function renderHeader() {
-			$cell = array();
+    public function isFilterable()
+    {
+        return $this->filterable;
+    }
 
-			if(isset($this->chainNumber))
-				$cell["COLUMNNUMBER"] = $this->chainNumber;
+    public function getChainNumber()
+    {
+        return $this->chainNumber;
+    }
 
-			$cell["DATA"] = $this->getLabel();
+    public function getUniqueIdentifier()
+    {
+        return md5($this->valueKey);
+    }
 
-			$cell["SORTABLE"] = $this->sortable ? : false;
-			$cell["DISPLAY_HEADER"] = $this->displayHeader;
+    public function hasAutoFilterValues()
+    {
+        return (isset($this->hasAutoFilterValues) && $this->hasAutoFilterValues);
+    }
 
-			//auto suggestion values
-			if($this->isFilterable()) {
-				$this->prepareFilterValues();
+    public function hasFilterValuesAlreadySet()
+    {
+        return (is_array($this->filterValues) && !empty($this->filterValues));
+    }
+        
 
-				// sort filter values alphabetically.
-				asort($this->filterValues);
+    /* PRIVATE METHODS */
+    private function prepareFilterValues()
+    {
+        switch ($this->type) {
+            case ("bool"):
+                $this->filterValues = array(
+                                            "true"  =>  oDataFrameworkHelperController::translate('labels.yes'),
+                                            "false"     =>  oDataFrameworkHelperController::translate('labels.no')
+                                        );
+                break;
+            case ("exists"):
+                $this->filterValues = array(
+                                            "true"  =>  oDataFrameworkHelperController::translate('labels.yes'),
+                                            "false"     =>  oDataFrameworkHelperController::translate('labels.no')
+                                        );
+                break;
+            default:
+                break;
+        }
+    }
 
-				$cell["FILTERABLE"] = array(
-					"values"		=> $this->filterValues,
-					"type"			=> $this->getAutoFilterType(),
-					"currentFilter" => $this->getCurrentFilter()
-				);
-			}
+    private function getAutoFilterType()
+    {
+        if ($this->type == "number") {
+            return "number";
+        }
 
-			if($this->alwaysVisible)
-				$cell["ALWAYSVISIBLE"] = $this->alwaysVisible;
+        if ($this->type == "decimal") {
+            return "decimal";
+        }
 
-			if(!$this->isEnabled()) {
-				$cell["DISABLED"] = "true";
-			}
+        if ($this->type == "currency" || $this->type == "currency-with-symbol") {
+            return "currency";
+        }
 
-			return $cell;
-		}
+        if ($this->type == "date" || $this->type == "timeline") {
+            return "date";
+        }
 
-	}
+        if ($this->type == "datetime") {
+            return "datetime";
+        }
+
+        if ($this->type == "exists") {
+            return "exists";
+        }
+
+        if ($this->type == "bool") {
+            return "selection";
+        }
+
+        if ($this->type == "suggestion") {
+            return "suggestion";
+        }
+
+        // fix that when selection was explicitly chosen, it was anyways
+        // defaulting to suggestion (as per the lines below)
+        if ($this->type == "selection") {
+            return "selection";
+        }
+
+        if ($this->hasAutoFilterValues()) {
+            return ((count($this->filterValues) > 25) ? "suggestion" : "selection");
+        }
+
+        return "suggestion";
+    }
+
+    private function getCurrentFilter()
+    {
+        return array(
+            "value"     => $this->currentFilterValue,
+            "method"    => $this->currentFilterMethod
+        );
+    }
+
+    public function renderHeader()
+    {
+        $cell = array();
+
+        if (isset($this->chainNumber)) {
+            $cell["COLUMNNUMBER"] = $this->chainNumber;
+        }
+
+        $cell["DATA"] = $this->getLabel();
+
+        $cell["SORTABLE"] = $this->sortable ? : false;
+        $cell["DISPLAY_HEADER"] = $this->displayHeader;
+
+        //auto suggestion values
+        if ($this->isFilterable()) {
+            $this->prepareFilterValues();
+
+            // sort filter values alphabetically.
+            asort($this->filterValues);
+
+            $cell["FILTERABLE"] = array(
+                "values"        => $this->filterValues,
+                "type"          => $this->getAutoFilterType(),
+                "currentFilter" => $this->getCurrentFilter()
+            );
+        }
+
+        if ($this->alwaysVisible) {
+            $cell["ALWAYSVISIBLE"] = $this->alwaysVisible;
+        }
+
+        if (!$this->isEnabled()) {
+            $cell["DISABLED"] = "true";
+        }
+
+        return $cell;
+    }
+}

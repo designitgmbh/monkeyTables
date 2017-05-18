@@ -5,34 +5,38 @@ use Illuminate\Database\Eloquent\Relations\MorphOneOrMany as MorphOneOrMany;
 
 class Model
 {
-    private 
-        $model,
+    private $model,
         $realTableName,
         $asTableName;
 
-    public function __construct($model) {
+    public function __construct($model)
+    {
         $this->model = $model;
 
         $this->handleTableAsStatement();
     }
     
-    public function getTableName() {
+    public function getTableName()
+    {
         return $this->asTableName;
     }
 
-    public function getRealTableName() {
+    public function getRealTableName()
+    {
         return $this->realTableName;
     }
 
-    public function getKeyName() {
+    public function getKeyName()
+    {
         return $this->model->getKeyName();
     }
 
-    private function handleTableAsStatement() {
+    private function handleTableAsStatement()
+    {
         $modelTable = $this->model->getTable();
         $modelTableAs = explode(' as ', $modelTable);
 
-        if(count($modelTableAs) > 1) {
+        if (count($modelTableAs) > 1) {
             $this->realTableName = $modelTableAs[0];
             $this->asTableName = $modelTableAs[1];
         } else {
@@ -41,38 +45,39 @@ class Model
         }
     }
 
-    public function getMorphTypeKeysFor($relationString) {
+    public function getMorphTypeKeysFor($relationString)
+    {
         $relation = $this->getRelation($relationString);
 
-        if($relation instanceof MorphOneOrMany) {
+        if ($relation instanceof MorphOneOrMany) {
             return (object)[
                 "key1" => str_replace('.', '', strstr($relation->getMorphType(), '.')),
                 "key2" => $relation->getMorphClass()
             ];
         } else {
             throw new NotMorphRelationException();
-        }        
+        }
     }
 
-    public function getRelationKeysFor($relationString, $hasWhereClause = false) {
+    public function getRelationKeysFor($relationString, $hasWhereClause = false)
+    {
         $relation = $this->getRelation($relationString);
 
         //TODO
             //change this, so that key1 & key2 are selected based on relation type
             //see the "hasOne" comment a bit down
-        if($hasWhereClause) {
+        if ($hasWhereClause) {
             $key1 = $relation->getForeignKey();
 
-            if(method_exists($relation, "getQualifiedParentKeyName")) {
+            if (method_exists($relation, "getQualifiedParentKeyName")) {
                 $key2 = $relation->getQualifiedParentKeyName();
-            } else if(method_exists($relation, "getOtherKey")) {
+            } elseif (method_exists($relation, "getOtherKey")) {
                 $key2 = $relation->getOtherKey();
             } else {
                 return "ERROR GETTING SECOND KEY";
             }
-
         } else {
-            if(method_exists($relation, "getQualifiedForeignKey") && method_exists($relation, "getQualifiedOtherKeyName")) {
+            if (method_exists($relation, "getQualifiedForeignKey") && method_exists($relation, "getQualifiedOtherKeyName")) {
                 $key1 = $relation->getQualifiedForeignKey();
                 $key2 = $relation->getQualifiedOtherKeyName();
             } else {
@@ -94,15 +99,16 @@ class Model
         ];
     }
 
-    private function fixTableAsForModelKey(&$key) {
+    private function fixTableAsForModelKey(&$key)
+    {
         $modelClass = $this->getShortModelClass();
         $modelClassSnake = snake_case($modelClass);
 
         $tables = explode('.', $key);
         $column = array_pop($tables);
 
-        foreach($tables as $table) {
-            $table = str_replace($modelClassSnake, $this->getTableName(), $table);    
+        foreach ($tables as $table) {
+            $table = str_replace($modelClassSnake, $this->getTableName(), $table);
         }
 
         $tables[] = $column;
@@ -110,27 +116,31 @@ class Model
         $key = implode('.', $tables);
     }
 
-    private function handelTableAsKey($key) {
+    private function handelTableAsKey($key)
+    {
         $keyAs = explode(' as ', $key);
-        if(count($keyAs) > 1) {
+        if (count($keyAs) > 1) {
             $key = $keyAs[1];
         }
 
         return $key;
     }
 
-    public function getRelatedModelFor($relationString) {
+    public function getRelatedModelFor($relationString)
+    {
         $relation = $this->getRelation($relationString);
         return new self($relation->getRelated());
     }
 
-    public function getRelation($relationString) {
+    public function getRelation($relationString)
+    {
         $this->hasRelation($relationString);
         return $this->model->$relationString();
     }
 
-    private function hasRelation($relationString) {
-        if(!method_exists($this->model, $relationString)) {
+    private function hasRelation($relationString)
+    {
+        if (!method_exists($this->model, $relationString)) {
             $modelClass = $this->getModelClass();
             throw new \Exception("Relation $relationString could not be fetched from $modelClass. Probably related object does not exist or is morphed.");
         }
@@ -138,11 +148,13 @@ class Model
         return true;
     }
 
-    public function getShortModelClass() {
+    public function getShortModelClass()
+    {
         return (new \ReflectionClass($this->model))->getShortName();
     }
 
-    public function getModelClass() {
+    public function getModelClass()
+    {
         return get_class($this->model);
     }
 }

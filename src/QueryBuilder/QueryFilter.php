@@ -3,16 +3,16 @@ namespace Designitgmbh\MonkeyTables\QueryBuilder;
 
 use DB;
 
-class QueryFilter 
+class QueryFilter
 {
-    private
-        $fieldName,
+    private $fieldName,
         $compare,
         $values,
 
         $needsHaving;
 
-    public function __construct($fieldName, $compare, $values, $queryColumn = null) {
+    public function __construct($fieldName, $compare, $values, $queryColumn = null)
+    {
         $this->fieldName = $fieldName;
         $this->compare = $compare;
         $this->values = $values;
@@ -20,25 +20,27 @@ class QueryFilter
         $this->needsHaving = $queryColumn ? $queryColumn->needsHaving() : false;
     }
 
-    public function applyOn($query) {
-        $query->where(function($subQuery) use($query) {
+    public function applyOn($query)
+    {
+        $query->where(function ($subQuery) use ($query) {
             $this->applyOnSubquery($subQuery, $query);
         });
     }
 
-    public function applyOnSubquery($query, $mainQuery = null) {
+    public function applyOnSubquery($query, $mainQuery = null)
+    {
         $having = [];
 
-        foreach($this->values as $value) {
-            if($this->needsHaving) {
+        foreach ($this->values as $value) {
+            if ($this->needsHaving) {
                 $having[] = $this->filteringHavingComparison($query, $value);
             } else {
                 $this->filteringWhereComparison($query, $value);
             }
         }
 
-        if(!empty($having)) {
-            if($mainQuery) {
+        if (!empty($having)) {
+            if ($mainQuery) {
                 $mainQuery->havingRaw(implode(' OR ', $having));
             } else {
                 $query->havingRaw(implode(' OR ', $having));
@@ -46,20 +48,21 @@ class QueryFilter
         }
     }
 
-    private function explodeCompare($value) {
+    private function explodeCompare($value)
+    {
         $compares = [];
 
-        switch($this->compare) {
-            case("between"):
+        switch ($this->compare) {
+            case ("between"):
                 $between = explode("|", $value);
-                if($between[0]) {
+                if ($between[0]) {
                     $compares[] = (object)[
                         "function" => "where",
                         "compare" => ">=",
                         "value" => $between[0]
                     ];
                 }
-                if($between[1]) {
+                if ($between[1]) {
                     $compares[] = (object)[
                         "function" => "where",
                         "compare" => "<=",
@@ -68,7 +71,7 @@ class QueryFilter
                 }
 
                 break;
-            case("contains"):
+            case ("contains"):
                 $compares[] = (object)[
                     "function" => "where",
                     "compare" => "LIKE",
@@ -76,11 +79,11 @@ class QueryFilter
                 ];
 
                 break;
-            case("exists"):
-                if($value == "true" || $value === true) {
-                    $function   = 'whereNotNull'; 
+            case ("exists"):
+                if ($value == "true" || $value === true) {
+                    $function   = 'whereNotNull';
                 } else {
-                    $function   = 'whereNull'; 
+                    $function   = 'whereNull';
                 }
 
                 $compares[] = (object)[
@@ -142,8 +145,7 @@ class QueryFilter
 
     protected function filteringHavingComparison($query, $value)
     {
-        return "( LOWER(" . $this->fieldName . ") " . $this->compare . " " . 
+        return "( LOWER(" . $this->fieldName . ") " . $this->compare . " " .
             $this->transformValueForFiter($value) . ")";
     }
-
 }

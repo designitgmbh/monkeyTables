@@ -9,11 +9,11 @@
      * @author     Philipp Pajak <p.pajak@design-it.de>
      * @license    https://raw.githubusercontent.com/designitgmbh/monkeyTables/master/LICENSE  BSD
      */
-    Class SylkWriterTemplate
+class SylkWriterTemplate
+{
+    public static function fileHeader()
     {
-        public static function fileHeader() 
-        {
-            return 'ID;PWXL;N;E
+        return 'ID;PWXL;N;E
 P;PGeneral
 P;P0
 P;P0.00
@@ -78,11 +78,11 @@ F;P0;DG0G10;M300
 B;Y3;X4;D0 0 2 3
 O;L;D;V0;K47;G100 0.001
 ';
-        }
-
-        public static function fileEnd() 
-        {
-            return 'E
-';
-        }
     }
+
+    public static function fileEnd()
+    {
+        return 'E
+';
+    }
+}

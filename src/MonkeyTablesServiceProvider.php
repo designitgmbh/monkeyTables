@@ -34,7 +34,8 @@ class MonkeyTablesServiceProvider extends ServiceProvider
         
         // use the vendor configuration file as fallback
         $this->mergeConfigFrom(
-            __DIR__.'/config/monkeyTables.php', 'monkeyTables'
+            __DIR__.'/config/monkeyTables.php',
+            'monkeyTables'
         );
 
         // use this if your package has assets
@@ -54,8 +55,7 @@ class MonkeyTablesServiceProvider extends ServiceProvider
      */
     public function setupRoutes(Router $router)
     {
-        $router->group(['namespace' => 'Designitgmbh\MonkeyTables\Http\Controllers'], function($router)
-        {
+        $router->group(['namespace' => 'Designitgmbh\MonkeyTables\Http\Controllers'], function ($router) {
             require __DIR__.'/Http/routes.php';
         });
     }
@@ -72,7 +72,7 @@ class MonkeyTablesServiceProvider extends ServiceProvider
 
     private function registerMonkeyTables()
     {
-        $this->app->bind('monkeyTables',function($app){
+        $this->app->bind('monkeyTables', function ($app) {
             return new MonkeyTables($app);
         });
     }

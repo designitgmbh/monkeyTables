@@ -34,9 +34,8 @@ class MonkeyTablesServiceProviderL4 extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('monkeyTables',function($app){
+        $this->app->bind('monkeyTables', function ($app) {
             return new MonkeyTables($app);
         });
     }
-
 }

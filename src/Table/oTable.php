@@ -1,586 +1,628 @@
 <?php
-	namespace Designitgmbh\MonkeyTables\Table;
-	use Designitgmbh\MonkeyTables\Data\oData;
+    namespace Designitgmbh\MonkeyTables\Table;
 
-	use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
-	use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
+    use Designitgmbh\MonkeyTables\Data\oData;
 
-	/**
-	 * A basic class that represents a table
-	 *
-	 * @package    MonkeyTables
-	 * @author     Philipp Pajak <p.pajak@design-it.de>
-	 * @license    https://raw.githubusercontent.com/designitgmbh/monkeyTables/master/LICENSE  BSD
-	 */
-	class oTable extends oData
-	{
-		protected $oTableRowClassName = __NAMESPACE__ . "\\" . "oTableRow";
-		protected $columns;
-		protected $quickSearchString;
+    use Designitgmbh\MonkeyTables\QueryBuilder\QueryBuilder;
+    use Designitgmbh\MonkeyTables\Http\Controllers\oTablesFrameworkHelperController;
 
-		public function __construct($name = "") {
-			parent::__construct($name);
-			
-			$this->columns 	= array();
-			$this->request 	= null;
-			$this->rows 	= array();
-			$this->exportType = null;
-		}
+    /**
+     * A basic class that represents a table
+     *
+     * @package    MonkeyTables
+     * @author     Philipp Pajak <p.pajak@design-it.de>
+     * @license    https://raw.githubusercontent.com/designitgmbh/monkeyTables/master/LICENSE  BSD
+     */
+class oTable extends oData
+{
+    protected $oTableRowClassName = __NAMESPACE__ . "\\" . "oTableRow";
+    protected $columns;
+    protected $quickSearchString;
 
-		// setter functions //
-		public function setRequest($request) {
-			$this->request = $request;
+    public function __construct($name = "")
+    {
+        parent::__construct($name);
+            
+        $this->columns  = array();
+        $this->request  = null;
+        $this->rows     = array();
+        $this->exportType = null;
+    }
 
-			return $this;
-		}
+    // setter functions //
+    public function setRequest($request)
+    {
+        $this->request = $request;
 
-		public function setRowClass($class) {
-			$this->rowClass = $class;
+        return $this;
+    }
 
-			return $this;
-		}
+    public function setRowClass($class)
+    {
+        $this->rowClass = $class;
 
-		public function setRowIDValueKey($valueKey) {
-			$this->rowIDValueKey = $valueKey;
+        return $this;
+    }
 
-			return $this;
-		}
+    public function setRowIDValueKey($valueKey)
+    {
+        $this->rowIDValueKey = $valueKey;
 
-		public function addStatusBar( $var, $arr ) {
-			if(is_callable($var)) {
-				//custom function
-				$callback = function($obj) use ($var) {
-					return $var($obj);
-				};
-			} else {
-				//map function
-				$callback = function($obj) use ($var, $arr) {
-					$value = $obj->$var;
+        return $this;
+    }
 
-					if(isset($arr[$value])) {
-						return $arr[$value];
-					}
-					return null;
-				};
-			}
-			$this->statusBarFunction = $callback;
+    public function addStatusBar($var, $arr)
+    {
+        if (is_callable($var)) {
+            //custom function
+            $callback = function ($obj) use ($var) {
+                return $var($obj);
+            };
+        } else {
+            //map function
+            $callback = function ($obj) use ($var, $arr) {
+                $value = $obj->$var;
 
-			return $this;
-		}
+                if (isset($arr[$value])) {
+                    return $arr[$value];
+                }
+                return null;
+            };
+        }
+        $this->statusBarFunction = $callback;
 
-		public function standardRowColor($color) {
-			if(is_callable($color)) {
-				$this->standardRowColorFunction = $color;
-			} else {
-				$this->standardRowColorFunction = function() {
-					return null;
-				};
-			}
+        return $this;
+    }
 
-			return $this;
-		}
+    public function standardRowColor($color)
+    {
+        if (is_callable($color)) {
+            $this->standardRowColorFunction = $color;
+        } else {
+            $this->standardRowColorFunction = function () {
+                return null;
+            };
+        }
 
-		//private functions //
-		protected function parseRequest() {
-			parent::parseRequest();
+        return $this;
+    }
 
-			//TODO
-			//	parse the request so that we fullfill the oTables2 specifications
-			//		means: calculation fixes etc, that in future might be already done by the client, do them here!
+    //private functions //
+    protected function parseRequest()
+    {
+        parent::parseRequest();
 
-			if(!isset($this->request['page']))
-				$this->request['page'] = 0;
-			if(!isset($this->request['resultsPerPage']))
-				$this->request['resultsPerPage'] = 0;
-            if(!isset($this->request['paginationType']))
-                $this->request['paginationType'] = 'FULL';
+        //TODO
+        //	parse the request so that we fullfill the oTables2 specifications
+        //		means: calculation fixes etc, that in future might be already done by the client, do them here!
 
-			$this->page 			= (intval($this->request['page']) > 0) ? intval($this->request['page']) : 0;
-			$this->resultsPerPage 	= (intval($this->request['resultsPerPage']) > 0) ? intval($this->request['resultsPerPage']) : 20;
-			$this->skipRows			= $this->page * $this->resultsPerPage;
-            $this->totalCountType   = self::TOTAL_COUNT_TYPE_JSON[$this->request['paginationType']];
+        if (!isset($this->request['page'])) {
+            $this->request['page'] = 0;
+        }
+        if (!isset($this->request['resultsPerPage'])) {
+            $this->request['resultsPerPage'] = 0;
+        }
+        if (!isset($this->request['paginationType'])) {
+            $this->request['paginationType'] = 'FULL';
+        }
 
-			//sorting
-			$this->sorting = (isset($this->request['sorting']) && $this->request['sorting'] != '') ? $this->request['sorting'] : array();
+        $this->page             = (intval($this->request['page']) > 0) ? intval($this->request['page']) : 0;
+        $this->resultsPerPage   = (intval($this->request['resultsPerPage']) > 0) ? intval($this->request['resultsPerPage']) : 20;
+        $this->skipRows             = $this->page * $this->resultsPerPage;
+        $this->totalCountType   = self::TOTAL_COUNT_TYPE_JSON[$this->request['paginationType']];
 
-			//quickSearch
-			$this->parseQuickSearch(isset($this->request['quickSearch']) ? $this->request['quickSearch'] : array());
+        //sorting
+        $this->sorting = (isset($this->request['sorting']) && $this->request['sorting'] != '') ? $this->request['sorting'] : array();
 
-			if (isset($this->request['trashed'])) {
-				$this->prefilter('!trashed');
-			}
+        //quickSearch
+        $this->parseQuickSearch(isset($this->request['quickSearch']) ? $this->request['quickSearch'] : array());
 
-			//export type
-			$this->exportType = isset($this->request['exportType']) ? $this->request['exportType'] : null;
-			$this->exportFilename = isset($this->request['exportFilename']) ? $this->request['exportFilename'] : null;
+        if (isset($this->request['trashed'])) {
+            $this->prefilter('!trashed');
+        }
 
-			//presets
-			if($this->presetHandler)
-				$this->handlePreset();
+        //export type
+        $this->exportType = isset($this->request['exportType']) ? $this->request['exportType'] : null;
+        $this->exportFilename = isset($this->request['exportFilename']) ? $this->request['exportFilename'] : null;
 
-			//caching
-				//TODO
-				//if caching for this table is enabled..
-					//take request, create hash
-					//check in cache if this request is already cached
-						//if cached -> check if it is not outdated
-		}
+        //presets
+        if ($this->presetHandler) {
+            $this->handlePreset();
+        }
 
-		private function handlePreset() {
-			$this->presetCanModify = false;
+        //caching
+            //TODO
+            //if caching for this table is enabled..
+                //take request, create hash
+                //check in cache if this request is already cached
+                    //if cached -> check if it is not outdated
+    }
 
-			if($this->presetHandler->isDeleteAction()) {
-				$this->presetHandler
-					->deletePresetSetting("filter")
-					->deletePresetSetting("sorting")
-					->deletePresetSetting("resultsPerPage")
-					->deletePresetSetting("columnArrangement")
-					->deletePresetSetting("hiddenColumns")
-					->deletePresetSetting(":hash");
+    private function handlePreset()
+    {
+        $this->presetCanModify = false;
 
-				$this->filter = array();
-				$this->sorting = array();
-				$this->resultsPerPage = 20;
-				$this->columnArrangement = null;
-				$this->hiddenColumns = null;
-			}
+        if ($this->presetHandler->isDeleteAction()) {
+            $this->presetHandler
+                ->deletePresetSetting("filter")
+                ->deletePresetSetting("sorting")
+                ->deletePresetSetting("resultsPerPage")
+                ->deletePresetSetting("columnArrangement")
+                ->deletePresetSetting("hiddenColumns")
+                ->deletePresetSetting(":hash");
 
-			if($this->presetHandler->isLoadAction()) {
-				$this->filter 				= $this->presetHandler->loadPresetSetting("filter");
-				$this->sorting 				= $this->presetHandler->loadPresetSetting("sorting");
-				$this->resultsPerPage 		= $this->presetHandler->loadPresetSetting("resultsPerPage");
-				$this->columnArrangement 	= $this->presetHandler->loadPresetSetting("columnArrangement");
-				$this->hiddenColumns 		= $this->presetHandler->loadPresetSetting("hiddenColumns");
+            $this->filter = array();
+            $this->sorting = array();
+            $this->resultsPerPage = 20;
+            $this->columnArrangement = null;
+            $this->hiddenColumns = null;
+        }
 
-				if($this->filter == null)
-					$this->filter = array();
+        if ($this->presetHandler->isLoadAction()) {
+            $this->filter               = $this->presetHandler->loadPresetSetting("filter");
+            $this->sorting              = $this->presetHandler->loadPresetSetting("sorting");
+            $this->resultsPerPage       = $this->presetHandler->loadPresetSetting("resultsPerPage");
+            $this->columnArrangement    = $this->presetHandler->loadPresetSetting("columnArrangement");
+            $this->hiddenColumns        = $this->presetHandler->loadPresetSetting("hiddenColumns");
 
-				if($this->sorting == null)
-					$this->sorting = array();
+            if ($this->filter == null) {
+                $this->filter = array();
+            }
 
-				if($this->resultsPerPage == null)
-					$this->resultsPerPage = 20;
-			}
+            if ($this->sorting == null) {
+                $this->sorting = array();
+            }
 
-			$presetHash = md5(
-				json_encode($this->filter).
-				json_encode($this->sorting).
-				json_encode($this->resultsPerPage).
-				json_encode($this->columnArrangement).
-				json_encode($this->hiddenColumns)
-			);
+            if ($this->resultsPerPage == null) {
+                $this->resultsPerPage = 20;
+            }
+        }
 
-			if($this->presetHandler->isSaveAction()) {
-				$this->presetHandler
-					->savePresetSetting("filter", $this->filter)
-					->savePresetSetting("sorting", $this->sorting)
-					->savePresetSetting("resultsPerPage", $this->resultsPerPage)
-					->savePresetSetting("columnArrangement", $this->columnArrangement)
-					->savePresetSetting("hiddenColumns", $this->hiddenColumns)
-					->savePresetSetting(":hash", $presetHash);
-			}
+        $presetHash = md5(
+            json_encode($this->filter).
+            json_encode($this->sorting).
+            json_encode($this->resultsPerPage).
+            json_encode($this->columnArrangement).
+            json_encode($this->hiddenColumns)
+        );
 
-			if($this->presetHandler->isPresetActive()) {
-				$preset = $this->presetHandler->getPreset();
-				$this->activePresetId 	= $preset->getId();
+        if ($this->presetHandler->isSaveAction()) {
+            $this->presetHandler
+                ->savePresetSetting("filter", $this->filter)
+                ->savePresetSetting("sorting", $this->sorting)
+                ->savePresetSetting("resultsPerPage", $this->resultsPerPage)
+                ->savePresetSetting("columnArrangement", $this->columnArrangement)
+                ->savePresetSetting("hiddenColumns", $this->hiddenColumns)
+                ->savePresetSetting(":hash", $presetHash);
+        }
 
-				if($preset->isGeneral())
-					$this->presetCanModify = oTablesFrameworkHelperController::canModifyGeneralPresets();
-				else
-					$this->presetCanModify = true;
+        if ($this->presetHandler->isPresetActive()) {
+            $preset = $this->presetHandler->getPreset();
+            $this->activePresetId   = $preset->getId();
 
-				if($this->activePresetId == "default") {
-					$this->presetIsModified = (
-						md5(json_encode(array()).json_encode(array()).json_encode(20).json_encode(null).json_encode(null)) != $presetHash
-					);
-				} else {
-					$this->presetIsModified = ($this->presetHandler->loadPresetSetting(":hash") != $presetHash);
-				}
-				
-			} else {
-				$this->activePresetId = null;
-				$this->presetIsModified = (
-						md5(json_encode(array()).json_encode(array()).json_encode(20).json_encode(null).json_encode(null)) != $presetHash
-					);
-			}
+            if ($preset->isGeneral()) {
+                $this->presetCanModify = oTablesFrameworkHelperController::canModifyGeneralPresets();
+            } else {
+                $this->presetCanModify = true;
+            }
 
-			$this->presetList = $this->presetHandler->getPresetList();
-		}
+            if ($this->activePresetId == "default") {
+                $this->presetIsModified = (
+                    md5(json_encode(array()).json_encode(array()).json_encode(20).json_encode(null).json_encode(null)) != $presetHash
+                );
+            } else {
+                $this->presetIsModified = ($this->presetHandler->loadPresetSetting(":hash") != $presetHash);
+            }
+        } else {
+            $this->activePresetId = null;
+            $this->presetIsModified = (
+                md5(json_encode(array()).json_encode(array()).json_encode(20).json_encode(null).json_encode(null)) != $presetHash
+            );
+        }
 
-		private function parseQuickSearch($quickSearch) {
-			/*
-				enabled: 		false,
-				searchString: 	""
-			*/
+        $this->presetList = $this->presetHandler->getPresetList();
+    }
 
-			if(!is_array($quickSearch))
-				return false;
+    private function parseQuickSearch($quickSearch)
+    {
+        /*
+            enabled:        false,
+            searchString:   ""
+        */
 
-			if(isset($quickSearch['enabled']) && $quickSearch['enabled'] && $quickSearch['enabled'] != "false") {
-				$this->quickSearchString = $quickSearch['searchString'];
-			} else {
-				$this->quickSearchString = false;
-			}
-		}
+        if (!is_array($quickSearch)) {
+            return false;
+        }
 
-		protected function createFilters() {
-			$filters = [];
+        if (isset($quickSearch['enabled']) && $quickSearch['enabled'] && $quickSearch['enabled'] != "false") {
+            $this->quickSearchString = $quickSearch['searchString'];
+        } else {
+            $this->quickSearchString = false;
+        }
+    }
 
-			$this
-				->createSelectFilters($filters)
-				->createPaginationFilters($filters)
-				->createSortingFilters($filters)
-				->createFilteringFilters($filters)
-				->createQuickSearchFilters($filters);
-			
-			return $filters;
-		}
+    protected function createFilters()
+    {
+        $filters = [];
 
-		protected function createPaginationFilters(&$filters) {
-			$filters["resultsPerPage"] 	= $this->resultsPerPage;
-			$filters["skipRows"]		= $this->skipRows;
+        $this
+            ->createSelectFilters($filters)
+            ->createPaginationFilters($filters)
+            ->createSortingFilters($filters)
+            ->createFilteringFilters($filters)
+            ->createQuickSearchFilters($filters);
+            
+        return $filters;
+    }
 
-			return $this;
-		}
+    protected function createPaginationFilters(&$filters)
+    {
+        $filters["resultsPerPage"]  = $this->resultsPerPage;
+        $filters["skipRows"]        = $this->skipRows;
 
-		protected function createSortingFilters(&$filters) {
-			if($this->sorting) {
-				$columnNumber = $this->sorting['column'];
+        return $this;
+    }
 
-                if(isset($this->columns[$columnNumber])) {
-                    $column = $this->columns[$columnNumber];
+    protected function createSortingFilters(&$filters)
+    {
+        if ($this->sorting) {
+            $columnNumber = $this->sorting['column'];
 
-                    if($column->isSortable()) {
-                        $sorting = [
-                            "valueKey" => $column->getValueKey(),
-                            "direction"=> $this->sorting['direction']
-                        ];
-                        $filters['sorting'] = $sorting; 
+            if (isset($this->columns[$columnNumber])) {
+                $column = $this->columns[$columnNumber];
+
+                if ($column->isSortable()) {
+                    $sorting = [
+                        "valueKey" => $column->getValueKey(),
+                        "direction"=> $this->sorting['direction']
+                    ];
+                    $filters['sorting'] = $sorting;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    protected function createFilteringFilters(&$filters)
+    {
+        $filterArray = [];
+
+        if (isset($this->filter) && is_array($this->filter)) {
+            foreach ($this->filter as $filter) {
+                if ($filter['value'] != "noFilter") {
+                    $columnNumber = $filter["column"];
+
+                    if (!isset($this->columns[$columnNumber])) {
+                        continue;
                     }
+
+                    $column = $this->columns[$columnNumber];
+                    $filterArray[] = [
+                        "valueKey"  => $column->getValueKey(),
+                        "compare"   => $filter['compare'] ? : '=',
+                        "value"         => $filter['value']
+                    ];
+
+                    $column
+                        ->setCurrentFilterValue($filter['value'])
+                        ->setCurrentFilterMethod($filter['compare']);
                 }
-			}
+            }
+            $filters['filter'] = $filterArray;
+        }
 
-			return $this;
-		}
+        return $this;
+    }
 
-		protected function createFilteringFilters(&$filters) {
-			$filterArray = [];
+    protected function createQuickSearchFilters(&$filters)
+    {
+        $quickSearchArray = [];
 
-			if(isset($this->filter) && is_array($this->filter)) {
-				foreach($this->filter as $filter) {
-					if($filter['value'] != "noFilter") {
-						$columnNumber = $filter["column"];
-
-                        if(!isset($this->columns[$columnNumber]))
-                            continue;
-
-						$column = $this->columns[$columnNumber];
-						$filterArray[] = [
-							"valueKey" 	=> $column->getValueKey(),
-							"compare"  	=> $filter['compare'] ? : '=',
-							"value"		=> $filter['value']
-						];
-
-						$column
-							->setCurrentFilterValue($filter['value'])
-							->setCurrentFilterMethod($filter['compare']);
-					}
-				}
-				$filters['filter'] = $filterArray;
-			}
-
-			return $this;
-		}
-
-		protected function createQuickSearchFilters(&$filters) {
-			$quickSearchArray = [];
-
-			if($this->quickSearchString) {
-				foreach($this->columns as $column) {
-					$valueKey = $column->getValueKey();
-					if(!$valueKey)
-						continue;
-
-					$quickSearchArray[] = [
-						"valueKey" 	=> $valueKey,
-						"value"		=> $this->quickSearchString
-					];
-				}
-				$filters['quickSearch'] = $quickSearchArray;
-			}
-
-			return $this;
-		}
-
-		protected function createSelectFilters(&$filters) {
-			$selectArray = [];
-
-			foreach($this->columns as $column) {
-				if(!$column->isEnabled())
-					continue;
-
-				$valueKey = $column->getValueKey();
-				if(!$valueKey)
-					continue;
-
-				$selectArray[] = [
-					"valueKey" => $valueKey
-				];
-			}
-
-			$filters['select'] = $selectArray;
-
-			return $this;
-		}
-
-		private function rearrangeColumns() {
-			//VISIBILITY
-			//	array of numbers, which represent the column number
-			//		no/empty array means display all otherwise do not display columns that are in the array
-			//ORDER
-			//	array of numbers, which represent the column number
-			//		new order according to array order
-
-			if(is_array($this->hiddenColumns) && count($this->hiddenColumns) > 0) {
-				foreach($this->hiddenColumns as $columnNumber) {
-					if(isset($this->columns[$columnNumber])) {
-						$this->columns[$columnNumber]->disable();
-					}
-				}
-			}
-
-			if(is_array($this->columnArrangement)) {
-				$columns = $this->columns;
-				$this->columns = array();
-				foreach($this->columnArrangement as $key => $value) {
-					if(isset($columns[$value])) {
-						$columns[$value]->setChainNumber($value);
-						array_push($this->columns, $columns[$value]);
-                        unset($columns[$value]);
-					}
-				}
-                foreach($columns as $key => $column) {
-                    $column->setChainNumber($key);
-                    array_push($this->columns, $column);
+        if ($this->quickSearchString) {
+            foreach ($this->columns as $column) {
+                $valueKey = $column->getValueKey();
+                if (!$valueKey) {
+                    continue;
                 }
-			} else {
-				foreach($this->columns as $key => $column) {
-					$column->setChainNumber($key);
-				}
-			}
 
-			return true;			
-		}
+                $quickSearchArray[] = [
+                    "valueKey"  => $valueKey,
+                    "value"         => $this->quickSearchString
+                ];
+            }
+            $filters['quickSearch'] = $quickSearchArray;
+        }
 
-		private function renderHeader() {
-			$this->DBController->getFilterValuesForColumns($this->columns);
-			//evaluate options
-			//todo
-			$options = array();
-			$this->header = $this->rowController->renderHeader($options);
-		}
+        return $this;
+    }
 
-		protected function getOptionsForTable() {
-			$options = [];
-			
-			if(isset($this->rowClass))
-				$options["CLASS"]	= $this->rowClass;
+    protected function createSelectFilters(&$filters)
+    {
+        $selectArray = [];
 
-			return $options;
-		}
-
-		protected function getOptionsForObject($obj) {
-			$options = [];
-
-			if(isset($this->rowIDValueKey)) {
-				$key 				= $this->rowIDValueKey;
-				$options["ID"]		= $obj->$key;
-			}
-
-			if(isset($this->statusBarFunction) && is_callable($this->statusBarFunction) && ($func = $this->statusBarFunction))
-				$options["STATUSBAR"] = $func($obj);
-
-			return $options;
-		}
-
-		protected function renderRows() {
-			$tableOptions = $this->getOptionsForTable();
-
-			foreach ($this->dataSet as $obj) {
-				$options = array_merge(
-					$tableOptions,
-					$this->getOptionsForObject($obj)
-				);
-				
-				$this->rows[] = $this->rowController->renderRow($obj, $options);
-				unset($obj);
-			}
-		}
-
-		protected function getDisplayedRowCount() {
-			return count($this->rows);
-		}
-
-		protected function isShowAll()
- 		{
- 			return $this->totalCountType == self::TOTAL_COUNT_TYPE_SHOW_ALL;
- 		}
-
-		private function toArray() {
-			//format needed for current JS Client
-				#general information
-				#header
-				#rows
-
-			/*
-			CANSAVEGENERALPRESETS: false
-			GENERALPRESETS: null
-			HASSTRIPES: null
-			ISGENERAL: false
-			ISSELECTABLE: null
-			PAGES: 0
-			PRESET: "default"
-			PRESETLIST: null
-			RESULTSPERPAGE: "20"
-			ROWS: 6*/
-
-			$displayedRowCount = $this->getDisplayedRowCount();
-
-			if( $displayedRowCount > 0 ) {
-				$pages = (int) floor( $this->rowsCount / $this->resultsPerPage ) 
-							- 
-						 ( (($this->rowsCount % $this->resultsPerPage) == 0)? 1 : 0 );
-			} else {
-				$pages = 0;
-			}
-
-            if($pages === 0) {
-                $this->totalCountType = self::TOTAL_COUNT_TYPE_FULL;
+        foreach ($this->columns as $column) {
+            if (!$column->isEnabled()) {
+                continue;
             }
 
-			$generalInformation = array(
-				"ROWS" => $displayedRowCount,
-				"PAGES" => $this->isShowAll() ? 0 : $pages,
-				"SORTING" => $this->sorting,
-				"RESULTSPERPAGE" => $this->isShowAll() ? $displayedRowCount : $this->resultsPerPage,
-				"TOTALRESULTS" => $this->rowsCount,
-                "PAGINATIONTYPE" => array_search($this->totalCountType, self::TOTAL_COUNT_TYPE_JSON),
-				"PRESETID" => $this->activePresetId,
-				"PRESETISMODIFIED" => $this->presetIsModified,
-				"PRESETCANMODIFY" => $this->presetCanModify,
-				"PRESETDEFAULTACTIVE" => $this->presetHandler->isDefaultPresetActive(),
-				"PRESETGENERALDEFAULTACTIVE" => $this->presetHandler->isGeneralDefaultPresetActive(),
-				"PRESETLIST" => $this->presetList
-			);
-
-			return array_merge(
-				array(
-					$generalInformation,
-					$this->header
-				),
-				$this->rows
-			);
-		}
-
-		private function exportAsSYLK($exportOptions = array()) {
-			$this->rowController->renderSYLKHeader();
-			foreach($this->dataSet as $obj)
-				$this->rowController->renderSYLKRow($obj);
-
-			$sylkFileContent = $this->rowController->renderSYLK();
-
-			if(isset($this->exportFilename))
-				$filename = $this->exportFilename;
-			else
-				$filename = "export";
-
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/vnd.ms-excel');
-			header('Content-Disposition: attachment; filename='.$filename.'.slk');
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-			header('Pragma: public');
-			echo utf8_encode($sylkFileContent);
-			die("");
-		}
-
-		private function exportAsCSV($exportOptions = array()) {
-			$options = array("A" => null);
-
-			//add csv for header
-			$csv = $this->rowController->renderCSVHeader($options);
-
-			//add csv for rows
-			foreach ($this->dataSet as $obj) {				
-				$csv .= $this->rowController->renderCSVRow($obj, $options);
-				unset($obj);
-			}
-
-			if(isset($this->exportFilename))
-				$filename = $this->exportFilename;
-			else
-				$filename = "export";
-
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/vnd.ms-excel');
-			header('Content-Disposition: attachment; filename='.$filename.'.csv');
-			header('Content-Transfer-Encoding: binary');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-			header('Pragma: public');
-			echo utf8_decode($csv);
-			die("");
-		}
-
-		private function export() {
-			return $this->toArray();
-		}
-
-
-		// class functions //
-		public function add($column) {
-            $id = $column->getUniqueIdentifier();
-
-            if(isset($this->columns[$id])) {
-                throw new \Exception("Column with value key '{$column->getValueKey()}' already exists. Please change value key, and make sure you do not create duplicate columns. Maybe you tried to change the content of the column with the alterDisplayValue function, be aware that this can only be used to make small adjustments but must not be used to load different data.");
+            $valueKey = $column->getValueKey();
+            if (!$valueKey) {
+                continue;
             }
 
-			$this->columns[$id] = $column;
+            $selectArray[] = [
+                "valueKey" => $valueKey
+            ];
+        }
 
-			return $this;
-		}
+        $filters['select'] = $selectArray;
 
-		public function render() {
-			$this->DBController 	= new QueryBuilder;
-			$this->helpController 	= new oTablesFrameworkHelperController;
+        return $this;
+    }
 
-			//assign helpController to all columns
-			foreach($this->columns as $column) {
-				$column->setFrameworkHelper($this->helpController);
-			}
+    private function rearrangeColumns()
+    {
+        //VISIBILITY
+        //	array of numbers, which represent the column number
+        //		no/empty array means display all otherwise do not display columns that are in the array
+        //ORDER
+        //	array of numbers, which represent the column number
+        //		new order according to array order
 
-			$this->parseRequest();
+        if (is_array($this->hiddenColumns) && count($this->hiddenColumns) > 0) {
+            foreach ($this->hiddenColumns as $columnNumber) {
+                if (isset($this->columns[$columnNumber])) {
+                    $this->columns[$columnNumber]->disable();
+                }
+            }
+        }
 
-			//if no dataSet available..
-				$this->prepareDBController();
+        if (is_array($this->columnArrangement)) {
+            $columns = $this->columns;
+            $this->columns = array();
+            foreach ($this->columnArrangement as $key => $value) {
+                if (isset($columns[$value])) {
+                    $columns[$value]->setChainNumber($value);
+                    array_push($this->columns, $columns[$value]);
+                    unset($columns[$value]);
+                }
+            }
+            foreach ($columns as $key => $column) {
+                $column->setChainNumber($key);
+                array_push($this->columns, $column);
+            }
+        } else {
+            foreach ($this->columns as $key => $column) {
+                $column->setChainNumber($key);
+            }
+        }
 
-			$this->rearrangeColumns();
-			$this->rowController = new $this->oTableRowClassName($this->columns);
+        return true;
+    }
 
-			switch($this->exportType) {
-				case("sylk"):
-					return $this->exportAsSYLK();
-				case("csv"):
-					return $this->exportAsCSV();
-				default:
-					$this->renderHeader();
-					$this->renderRows();
+    private function renderHeader()
+    {
+        $this->DBController->getFilterValuesForColumns($this->columns);
+        //evaluate options
+        //todo
+        $options = array();
+        $this->header = $this->rowController->renderHeader($options);
+    }
 
-					return $this->export();
-			}			
-		}
+    protected function getOptionsForTable()
+    {
+        $options = [];
+            
+        if (isset($this->rowClass)) {
+            $options["CLASS"]   = $this->rowClass;
+        }
+
+        return $options;
+    }
+
+    protected function getOptionsForObject($obj)
+    {
+        $options = [];
+
+        if (isset($this->rowIDValueKey)) {
+            $key                = $this->rowIDValueKey;
+            $options["ID"]      = $obj->$key;
+        }
+
+        if (isset($this->statusBarFunction) && is_callable($this->statusBarFunction) && ($func = $this->statusBarFunction)) {
+            $options["STATUSBAR"] = $func($obj);
+        }
+
+        return $options;
+    }
+
+    protected function renderRows()
+    {
+        $tableOptions = $this->getOptionsForTable();
+
+        foreach ($this->dataSet as $obj) {
+            $options = array_merge(
+                $tableOptions,
+                $this->getOptionsForObject($obj)
+            );
+                
+            $this->rows[] = $this->rowController->renderRow($obj, $options);
+            unset($obj);
+        }
+    }
+
+    protected function getDisplayedRowCount()
+    {
+        return count($this->rows);
+    }
+
+    protected function isShowAll()
+    {
+        return $this->totalCountType == self::TOTAL_COUNT_TYPE_SHOW_ALL;
+    }
+
+    private function toArray()
+    {
+        //format needed for current JS Client
+            #general information
+            #header
+            #rows
+
+        /*
+        CANSAVEGENERALPRESETS: false
+        GENERALPRESETS: null
+        HASSTRIPES: null
+        ISGENERAL: false
+        ISSELECTABLE: null
+        PAGES: 0
+        PRESET: "default"
+        PRESETLIST: null
+        RESULTSPERPAGE: "20"
+        ROWS: 6*/
+
+        $displayedRowCount = $this->getDisplayedRowCount();
+
+        if ($displayedRowCount > 0) {
+            $pages = (int) floor($this->rowsCount / $this->resultsPerPage)
+                        -
+                     ( (($this->rowsCount % $this->resultsPerPage) == 0)? 1 : 0 );
+        } else {
+            $pages = 0;
+        }
+
+        if ($pages === 0) {
+            $this->totalCountType = self::TOTAL_COUNT_TYPE_FULL;
+        }
+
+        $generalInformation = array(
+            "ROWS" => $displayedRowCount,
+            "PAGES" => $this->isShowAll() ? 0 : $pages,
+            "SORTING" => $this->sorting,
+            "RESULTSPERPAGE" => $this->isShowAll() ? $displayedRowCount : $this->resultsPerPage,
+            "TOTALRESULTS" => $this->rowsCount,
+            "PAGINATIONTYPE" => array_search($this->totalCountType, self::TOTAL_COUNT_TYPE_JSON),
+            "PRESETID" => $this->activePresetId,
+            "PRESETISMODIFIED" => $this->presetIsModified,
+            "PRESETCANMODIFY" => $this->presetCanModify,
+            "PRESETDEFAULTACTIVE" => $this->presetHandler->isDefaultPresetActive(),
+            "PRESETGENERALDEFAULTACTIVE" => $this->presetHandler->isGeneralDefaultPresetActive(),
+            "PRESETLIST" => $this->presetList
+        );
+
+        return array_merge(
+            array(
+                $generalInformation,
+                $this->header
+            ),
+            $this->rows
+        );
+    }
+
+    private function exportAsSYLK($exportOptions = array())
+    {
+        $this->rowController->renderSYLKHeader();
+        foreach ($this->dataSet as $obj) {
+            $this->rowController->renderSYLKRow($obj);
+        }
+
+        $sylkFileContent = $this->rowController->renderSYLK();
+
+        if (isset($this->exportFilename)) {
+            $filename = $this->exportFilename;
+        } else {
+            $filename = "export";
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename='.$filename.'.slk');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        echo utf8_encode($sylkFileContent);
+        die("");
+    }
+
+    private function exportAsCSV($exportOptions = array())
+    {
+        $options = array("A" => null);
+
+        //add csv for header
+        $csv = $this->rowController->renderCSVHeader($options);
+
+        //add csv for rows
+        foreach ($this->dataSet as $obj) {
+            $csv .= $this->rowController->renderCSVRow($obj, $options);
+            unset($obj);
+        }
+
+        if (isset($this->exportFilename)) {
+            $filename = $this->exportFilename;
+        } else {
+            $filename = "export";
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename='.$filename.'.csv');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        echo utf8_decode($csv);
+        die("");
+    }
+
+    private function export()
+    {
+        return $this->toArray();
+    }
 
 
-	}
-?>
+    // class functions //
+    public function add($column)
+    {
+        $id = $column->getUniqueIdentifier();
+
+        if (isset($this->columns[$id])) {
+            throw new \Exception("Column with value key '{$column->getValueKey()}' already exists. Please change value key, and make sure you do not create duplicate columns. Maybe you tried to change the content of the column with the alterDisplayValue function, be aware that this can only be used to make small adjustments but must not be used to load different data.");
+        }
+
+        $this->columns[$id] = $column;
+
+        return $this;
+    }
+
+    public function render()
+    {
+        $this->DBController     = new QueryBuilder;
+        $this->helpController   = new oTablesFrameworkHelperController;
+
+        //assign helpController to all columns
+        foreach ($this->columns as $column) {
+            $column->setFrameworkHelper($this->helpController);
+        }
+
+        $this->parseRequest();
+
+        //if no dataSet available..
+            $this->prepareDBController();
+
+        $this->rearrangeColumns();
+        $this->rowController = new $this->oTableRowClassName($this->columns);
+
+        switch ($this->exportType) {
+            case ("sylk"):
+                return $this->exportAsSYLK();
+            case ("csv"):
+                return $this->exportAsCSV();
+            default:
+                $this->renderHeader();
+                $this->renderRows();
+
+                return $this->export();
+        }
+    }
+}

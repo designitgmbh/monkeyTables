@@ -9,45 +9,42 @@ namespace Designitgmbh\MonkeyTables\Export;
  * @license    https://raw.githubusercontent.com/designitgmbh/monkeyTables/master/LICENSE  BSD
  */
 
-class WExport {
-	
-	public static function exportPDF($route, $postData = null, $returnResponse = true) 
-	{
-		if($cookieName = config('monkeyTables.export.cookie'))
-		{
-			$cookieEnc = $_COOKIE[$cookieName];
-		}
-		else
-		{
-			$encrypter = app()->make('encrypter');
-			$cookieName= 'laravel_session';
-			$cookieEnc = $encrypter->encrypt(Session::getId());
-		}
-		
+class WExport
+{
+    
+    public static function exportPDF($route, $postData = null, $returnResponse = true)
+    {
+        if ($cookieName = config('monkeyTables.export.cookie')) {
+            $cookieEnc = $_COOKIE[$cookieName];
+        } else {
+            $encrypter = app()->make('encrypter');
+            $cookieName= 'laravel_session';
+            $cookieEnc = $encrypter->encrypt(Session::getId());
+        }
+        
 
-		$businessPaper = (object)config('monkeyTables.businessPaper');
+        $businessPaper = (object)config('monkeyTables.businessPaper');
 
-		$params = [
-			'url' => $route,
-			'download' => 'false',
-			'format' => $businessPaper->paperSize['name'],
-			'orientation' => $businessPaper->orientation,
-			'margin' => $businessPaper->margin . $businessPaper->units,
-			'sessionCookie' => json_encode(array(
-				"name"   => $cookieName, 
-				"value"  => $cookieEnc, 
-				"domain" => $_SERVER['SERVER_NAME']
-			)),
-			'postData' => json_encode($postData)
-		];
+        $params = [
+            'url' => $route,
+            'download' => 'false',
+            'format' => $businessPaper->paperSize['name'],
+            'orientation' => $businessPaper->orientation,
+            'margin' => $businessPaper->margin . $businessPaper->units,
+            'sessionCookie' => json_encode(array(
+                "name"   => $cookieName,
+                "value"  => $cookieEnc,
+                "domain" => $_SERVER['SERVER_NAME']
+            )),
+            'postData' => json_encode($postData)
+        ];
 
-		$output = WCurl::getRequest(config('monkeyTables.service.html2pdf'), $params);
+        $output = WCurl::getRequest(config('monkeyTables.service.html2pdf'), $params);
 
-		if($returnResponse)
-			return response($output, 200, array('content-type' => 'application/pdf'));
-		else
-			return $output;
-	}
+        if ($returnResponse) {
+            return response($output, 200, array('content-type' => 'application/pdf'));
+        } else {
+            return $output;
+        }
+    }
 }
-
-?>

@@ -3,11 +3,13 @@ namespace Designitgmbh\MonkeyTables\QueryBuilder;
 
 class Statement
 {
-    public function __construct($query) {
+    public function __construct($query)
+    {
         $this->statement = $this->setStatementFromQuery($query);
     }
 
-    private function setStatementFromQuery($query) {
+    private function setStatementFromQuery($query)
+    {
         $query = $query->getQuery()->getQuery();
         $this->connection = $query->getConnection();
 
@@ -15,10 +17,11 @@ class Statement
         $pdo = $this->connection->getReadPdo();
         $statement = $pdo->prepare($sqlQuery);
 
-        return $statement;      
+        return $statement;
     }
 
-    public function fetchResults($query) {
+    public function fetchResults($query)
+    {
         $query = $query->getQuery();
         $bindings = $query->getBindings();
 
