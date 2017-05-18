@@ -104,13 +104,19 @@ class QueryFilter
 
     protected function transformValueForFiter($value)
     {
-        if(is_numeric($value)) {
+        if (is_numeric($value)) {
             return DB::raw("$value");
-        } else if (is_bool($value)) {
+        } elseif (is_bool($value)) {
             return DB::raw($value ? 1 : 0);
+        } elseif ($this->isDate($value)) {
+            return DB::raw("'$value'");
         }
-
         return DB::raw("LOWER('$value')");
+    }
+
+    protected function isDate($value)
+    {
+        return strtotime($value) !== false;
     }
 
     /**
@@ -120,12 +126,13 @@ class QueryFilter
     protected function filteringWhereComparison($query, $value)
     {
         $compares = $this->explodeCompare($value);
-        $query = $query->orWhere(function($subquery) use($compares) {
-            foreach($compares as $compare) {
+        $query = $query->orWhere(function ($subquery) use ($compares) {
+            foreach ($compares as $compare) {
                 $function = $compare->function;
-
                 $subquery = $subquery->$function(
-                    DB::raw("LOWER(" . $this->fieldName . ")"), 
+                    $this->isDate($compare->value)
+                        ? DB::raw("{$this->fieldName}")
+                        : DB::raw("LOWER(" . $this->fieldName . ")"),
                     $compare->compare,
                     $this->transformValueForFiter($compare->value)
                 );
