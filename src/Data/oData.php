@@ -37,10 +37,12 @@
             TOTAL_COUNT_TYPE_NONE       = 0,
             TOTAL_COUNT_TYPE_FULL       = 1,
             TOTAL_COUNT_TYPE_NEXT_PAGE  = 2,
+            TOTAL_COUNT_TYPE_SHOW_ALL   = 3,
             TOTAL_COUNT_TYPE_JSON       = [
                 'NONE'      => 0,
                 'FULL'      => 1,
-                'NEXT_PAGE' => 2
+                'NEXT_PAGE' => 2,
+                'SHOW_ALL'  => 3,
             ];
 
 		protected

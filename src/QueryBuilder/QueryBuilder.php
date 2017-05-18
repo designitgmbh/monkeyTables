@@ -315,7 +315,8 @@ class QueryBuilder
 
         $query->groupBy($this->groupBy);
 
-        $this->rowCount = $this->needsRowCount ? $query->count() : 0;
+        $showAll = $this->totalCountType == oData::TOTAL_COUNT_TYPE_SHOW_ALL;
+        $this->rowCount = $this->needsRowCount || $showAll ? $query->count() : 0;
 
         if (isset($filters['sorting'])) {
             $queryColumn = QueryColumnFactoryStorage::byValueKey($filters['sorting']['valueKey']);
@@ -332,10 +333,10 @@ class QueryBuilder
             }
         }
 
-        $skipRows = (isset($filters['skipRows']) ? $filters['skipRows'] : 0);
-        $resultsPerPage = (isset($filters['resultsPerPage']) ? $filters['resultsPerPage'] : 0);
+        $skipRows = (isset($filters['skipRows']) && !$showAll ? $filters['skipRows'] : 0);
+        $resultsPerPage = (isset($filters['resultsPerPage']) && !$showAll ? $filters['resultsPerPage'] : 0);
 
-        if ($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE) {
+        if ($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE || $showAll) {
             $resultsPerPage++;
         }
 

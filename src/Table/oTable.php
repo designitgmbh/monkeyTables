@@ -421,6 +421,11 @@
 			return count($this->rows);
 		}
 
+		protected function isShowAll()
+ 		{
+ 			return $this->totalCountType == self::TOTAL_COUNT_TYPE_SHOW_ALL;
+ 		}
+
 		private function toArray() {
 			//format needed for current JS Client
 				#general information
@@ -455,9 +460,9 @@
 
 			$generalInformation = array(
 				"ROWS" => $displayedRowCount,
-				"PAGES" => $pages,
+				"PAGES" => $this->isShowAll() ? 0 : $pages,
 				"SORTING" => $this->sorting,
-				"RESULTSPERPAGE" => $this->resultsPerPage,
+				"RESULTSPERPAGE" => $this->isShowAll() ? $displayedRowCount : $this->resultsPerPage,
 				"TOTALRESULTS" => $this->rowsCount,
                 "PAGINATIONTYPE" => array_search($this->totalCountType, self::TOTAL_COUNT_TYPE_JSON),
 				"PRESETID" => $this->activePresetId,
