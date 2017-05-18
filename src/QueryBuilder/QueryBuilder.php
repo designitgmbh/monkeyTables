@@ -56,27 +56,34 @@ class QueryBuilder
                 $s2 = explode("]", $s1[1]);
 
                 $part = $s1[0];
-                $condition = $s2[0];
+                $conditions = $s2[0];
 
-                if (strpos($condition, " in ")) {
-                    $operator = " in ";
-                } elseif (strpos($condition, "!=")) {
-                    $operator = "!=";
-                } else {
-                    $operator = "=";
+                $query = $obj->$part();
+
+                foreach (explode(",", $conditions) as $condition) {
+                    if (strpos($condition, " in ")) {
+                        $operator = " in ";
+                    } elseif (strpos($condition, "!=")) {
+                        $operator = "!=";
+                    } else {
+                        $operator = "=";
+                    }
+
+                    $condition = explode($operator, $condition);
+
+                    $conditionField = $condition[0];
+                    $conditionValue = $condition[1];
+
+                    //use condition
+                    if ($operator == " in ") {
+                        $values = explode(";", $conditionValue);
+                        $join->where($conditionField, "in (" . implode(",", $values) . ") and 1 = ", 1);
+                    } else {
+                        $query->where($conditionField, $operator, $conditionValue);
+                    }
                 }
 
-                $condition = explode($operator, $condition);
-
-                $conditionField = $condition[0];
-                $conditionValue = $condition[1];
-
-                //use condition
-                if ($operator == " in ") {
-                    $obj = $obj->$part()->whereIn($conditionField, explode(";", $conditionValue))->first();
-                } else {
-                    $obj = $obj->$part()->where($conditionField, $operator, $conditionValue)->first();
-                }
+                $obj = $obj->first();
             } else {
                 if ((strpos($part, "()") !== false)) {
                     $part = str_replace("()", "", $part);
