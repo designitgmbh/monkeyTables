@@ -336,7 +336,7 @@ class QueryBuilder
         $skipRows = (isset($filters['skipRows']) && !$showAll ? $filters['skipRows'] : 0);
         $resultsPerPage = (isset($filters['resultsPerPage']) && !$showAll ? $filters['resultsPerPage'] : 0);
 
-        if ($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE || $showAll) {
+        if ($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE) {
             $resultsPerPage++;
         }
 
@@ -360,7 +360,7 @@ class QueryBuilder
 
         $results = $query->get();
 
-        if ($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE) {
+        if ($this->totalCountType == oData::TOTAL_COUNT_TYPE_NEXT_PAGE || $showAll) {
             $fetchedResults = count($results);
             $fetchedNextPage = $fetchedResults === $resultsPerPage;
 
