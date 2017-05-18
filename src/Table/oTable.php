@@ -93,8 +93,8 @@ class oTable extends oData
         parent::parseRequest();
 
         //TODO
-        //	parse the request so that we fullfill the oTables2 specifications
-        //		means: calculation fixes etc, that in future might be already done by the client, do them here!
+        //  parse the request so that we fullfill the oTables2 specifications
+        //      means: calculation fixes etc, that in future might be already done by the client, do them here!
 
         if (!isset($this->request['page'])) {
             $this->request['page'] = 0;
@@ -106,9 +106,17 @@ class oTable extends oData
             $this->request['paginationType'] = 'FULL';
         }
 
+        $resultsPerPage = intval($this->request['resultsPerPage']);
+        if ($resultsPerPage > 100) {
+            $this->resultsPerPage = 100;
+        } elseif ($resultsPerPage > 0) {
+            $this->resultsPerPage = $resultsPerPage;
+        } else {
+            $this->resultsPerPage = 20;
+        }
+
         $this->page             = (intval($this->request['page']) > 0) ? intval($this->request['page']) : 0;
-        $this->resultsPerPage   = (intval($this->request['resultsPerPage']) > 0) ? intval($this->request['resultsPerPage']) : 20;
-        $this->skipRows             = $this->page * $this->resultsPerPage;
+        $this->skipRows         = $this->page * $this->resultsPerPage;
         $this->totalCountType   = self::TOTAL_COUNT_TYPE_JSON[$this->request['paginationType']];
 
         //sorting
@@ -364,11 +372,11 @@ class oTable extends oData
     private function rearrangeColumns()
     {
         //VISIBILITY
-        //	array of numbers, which represent the column number
-        //		no/empty array means display all otherwise do not display columns that are in the array
+        //  array of numbers, which represent the column number
+        //      no/empty array means display all otherwise do not display columns that are in the array
         //ORDER
-        //	array of numbers, which represent the column number
-        //		new order according to array order
+        //  array of numbers, which represent the column number
+        //      new order according to array order
 
         if (is_array($this->hiddenColumns) && count($this->hiddenColumns) > 0) {
             foreach ($this->hiddenColumns as $columnNumber) {
