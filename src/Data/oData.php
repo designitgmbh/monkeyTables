@@ -233,6 +233,7 @@ class oData
         switch ($totalCountType) {
             case (self::TOTAL_COUNT_TYPE_NEXT_PAGE):
             case (self::TOTAL_COUNT_TYPE_NONE):
+            case (self::TOTAL_COUNT_TYPE_SHOW_ALL):
                 return false;
 
             default:
