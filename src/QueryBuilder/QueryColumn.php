@@ -331,8 +331,8 @@ class QueryColumn
                     $key2 = str_replace("!!!!mainTable!!!!", $aliasName, $key2);
                 } else {
                     //if two different tables, replace any occurrence of table in any key
-                    $key1 = str_replace($table, $aliasName, $key1);
-                    $key2 = str_replace($table, $aliasName, $key2);
+                    $key1 = $this->changeTableNameIfCorresponds($key1, $aliasName);
+                    $key2 = $this->changeTableNameIfCorresponds($key2, $aliasName);
                 }
             }
 
@@ -341,8 +341,8 @@ class QueryColumn
 
                 //replace table name in other key
                 //preg_replace to ensure that it's changed only the name of the corresponding table
-                $key1 = preg_match("!^({$table})\.!im", $key1)? str_replace($table, $aliasName, $key1):$key1;
-                $key2 = preg_match("!^({$table})\.!im", $key2)? str_replace($table, $aliasName, $key2):$key2;
+                $key1 = $this->changeTableNameIfCorresponds($key1, $aliasName);
+                $key2 = $this->changeTableNameIfCorresponds($key2, $aliasName);
             }
 
             //the first key might need to use an alias name for its table
@@ -375,5 +375,17 @@ class QueryColumn
         $this->tableRealName  = $table;
 
         $this->keysForJoin = array($key1, $key2);
+    }
+
+    public function changeTableNameIfCorresponds($expression, $aliasName)
+    {
+        if(preg_match("!^({$this->model->getTableName()})\.!im", $expression))
+            return str_replace(
+                $this->model->getTableName(), 
+                $aliasName, 
+                $expression
+            );
+
+        return $expression;
     }
 }
