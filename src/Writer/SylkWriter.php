@@ -111,6 +111,10 @@ class SylkWriter
             return '"' . $value . '"';
         }
 
+        //html entities gives some issues when opening the file with Excel
+        //we convert the entities again to their applicable characters
+        $value = html_entity_decode($value);
+
         switch ($this->columns[$columnIdx]) {
             case ("currency"):
                 $value = preg_replace('([^0-9.,])', '', $value);
