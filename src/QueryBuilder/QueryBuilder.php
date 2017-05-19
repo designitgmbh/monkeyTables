@@ -77,13 +77,13 @@ class QueryBuilder
                     //use condition
                     if ($operator == " in ") {
                         $values = explode(";", $conditionValue);
-                        $obj = $query->where($conditionField, "in (" . implode(",", $values) . ") and 1 = ", 1);
+                        $query->where($conditionField, "in (" . implode(",", $values) . ") and 1 = ", 1);
                     } else {
-                        $obj = $query->where($conditionField, $operator, $conditionValue);
+                        $query->where($conditionField, $operator, $conditionValue);
                     }
                 }
 
-                $obj = $obj->first();
+                $obj = $query->first();
             } else {
                 if ((strpos($part, "()") !== false)) {
                     $part = str_replace("()", "", $part);
