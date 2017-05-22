@@ -334,6 +334,11 @@ class QueryColumn
                     //regex to avoid changing wrong table name
                     $key1 = $this->changeTableNameIfCorresponds($table, $aliasName, $key1);
                     $key2 = $this->changeTableNameIfCorresponds($table, $aliasName, $key2);
+
+                    //to avoid the ambigous columns 
+                    //we set the alias of the table when it's only present the name of the column
+                    if (strpos($key1, '.') === false)
+                        $key1 = $aliasName.".".$key1;
                 }
             }
 
