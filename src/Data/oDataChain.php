@@ -251,6 +251,10 @@ class oDataChain
             return "exists";
         }
 
+        if ($this->type == "multi-selection") {
+            return "multi-selection";
+        }
+
         if ($this->type == "bool") {
             return "selection";
         }
