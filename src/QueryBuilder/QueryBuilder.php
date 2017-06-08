@@ -264,66 +264,63 @@ class QueryBuilder
         }
     }
 
-    public function getRows($filters)
+    private function applyFiltersFor($filters, $filterName, $callback)
     {
-        $query = Query::fromModel($this->getModel());
-        $query->prefetch($this->prefetch);
-
-        $this->applyPrejoin($query);
-        $this->applyPrefilter($query);
-
-        $query->basicSelect($this->select);
-
-        if (isset($filters['select'])) {
-            foreach ($filters['select'] as $filter) {
+        if (isset($filters[$filterName])) {
+            foreach ($filters[$filterName] as $filter) {
                 $queryColumn = QueryColumnFactoryStorage::byValueKey($filter['valueKey']);
 
                 if (!$queryColumn->isFetchable()) {
                     continue;
                 }
 
-                if ($queryColumn->needsSelect()) {
-                    $query->select($queryColumn->getSelectClause());
-                }
+                $callback($queryColumn, $filter);
             }
         }
+    }
 
-        if (isset($filters['filter']) && is_array($filters['filter'])) {
-            foreach ($filters['filter'] as $filter) {
-                $queryColumn   = QueryColumnFactoryStorage::byValueKey($filter['valueKey']);
-
-                if (!$queryColumn->isFetchable()) {
-                    continue;
-                }
-
-                if ($queryColumn->needsJoin()) {
-                    $query->join($queryColumn);
-                }
-
-                $query->filter($filter, $queryColumn);
+    private function applyCustomFilters($query, $filters)
+    {
+        $this->applyFiltersFor($filters, 'select', function($queryColumn, $filter) use ($query) {
+            if ($queryColumn->needsSelect()) {
+                $query->select($queryColumn->getSelectClause());
             }
-        }
+        });
 
-        if (isset($filters['quickSearch']) && is_array($filters['quickSearch'])) {
-            foreach ($filters['quickSearch'] as $key => $filter) {
-                $queryColumn = QueryColumnFactoryStorage::byValueKey($filter['valueKey']);
-
-                if (!$queryColumn->isFetchable() || $queryColumn->needsHaving()) {
-                    continue;
-                }
-
-                if ($queryColumn->needsJoin()) {
-                    $query->join($queryColumn);
-                }
-
-                $query->quickSearch($queryColumn->getFieldName(), $filter['value']);
+        $this->applyFiltersFor($filters, 'filter', function($queryColumn, $filter) use ($query) {
+            if ($queryColumn->needsJoin()) {
+                $query->join($queryColumn);
             }
-        }
 
-        $query->groupBy($this->groupBy);
+            $query->filter($filter, $queryColumn);
+        });
 
-        $this->rowCount = $this->needsRowCount ? $query->count() : 0;
+        $this->applyFiltersFor($filters, 'quickSearch', function($queryColumn, $filter) use ($query) {
+            if ($queryColumn->needsHaving()) {
+                return;
+            }
 
+            if ($queryColumn->needsJoin()) {
+                $query->join($queryColumn);
+            }
+
+            $query->quickSearch($queryColumn->getFieldName(), $filter['value']);
+        });
+    }
+
+    private function applySumFilters($query, $filters)
+    {
+        $this->applyFiltersFor($filters, 'sum', function($queryColumn, $filter) use ($query) {
+            if ($queryColumn->needsJoin()) {
+                $query->join($queryColumn);
+            }
+
+            $query->sum($queryColumn->getFieldName(), $filter['chainNumber']);
+        });
+    }
+
+    private function applySortingFilters($query, $filters)
+    {
         if (isset($filters['sorting'])) {
             $queryColumn = QueryColumnFactoryStorage::byValueKey($filters['sorting']['valueKey']);
 
@@ -338,6 +335,40 @@ class QueryBuilder
                 );
             }
         }
+    }
+
+    private function createBaseQuery($filters)
+    {
+        $query = Query::fromModel($this->getModel());
+        $query->prefetch($this->prefetch);
+
+        $this->applyPrejoin($query);
+        $this->applyPrefilter($query);
+
+        $query->basicSelect($this->select);
+
+        $this->applyCustomFilters($query, $filters);
+
+        $query->groupBy($this->groupBy);
+
+        return $query;
+    }
+
+    public function calculateTotals($filters)
+    {
+        $query = $this->createBaseQuery($filters);
+        $this->applySumFilters($query, $filters);
+
+        return $query->totals();
+    }
+
+    public function getRows($filters)
+    {
+        $query = $this->createBaseQuery($filters);
+
+        $this->rowCount = $this->needsRowCount ? $query->count() : 0;
+
+        $this->applySortingFilters($query, $filters);
 
         $showAll = $this->totalCountType == oData::TOTAL_COUNT_TYPE_SHOW_ALL;
         $skipRows = (isset($filters['skipRows']) && !$showAll ? $filters['skipRows'] : 0);

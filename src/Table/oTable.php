@@ -258,7 +258,8 @@ class oTable extends oData
             ->createPaginationFilters($filters)
             ->createSortingFilters($filters)
             ->createFilteringFilters($filters)
-            ->createQuickSearchFilters($filters);
+            ->createQuickSearchFilters($filters)
+            ->createSumFilters($filters);;
             
         return $filters;
     }
@@ -365,6 +366,30 @@ class oTable extends oData
         }
 
         $filters['select'] = $selectArray;
+
+        return $this;
+    }
+
+    protected function createSumFilters(&$filters) {
+        $sumArray = [];
+
+        foreach($this->columns as $column) {
+            if($column->getType() != 'number') {
+                continue;
+            }
+
+            $valueKey = $column->getValueKey();
+            if(!$valueKey) {
+                continue;
+            }
+
+            $sumArray[] = [
+                "chainNumber" => $column->getChainNumber(),
+                "valueKey" => $valueKey
+            ];
+        }
+
+        $filters['sum'] = $sumArray;
 
         return $this;
     }
@@ -588,6 +613,10 @@ class oTable extends oData
         return $this->toArray();
     }
 
+    private function exportTotals() {
+        return $this->dataSet;
+    }
+
 
     // class functions //
     public function add($column)
@@ -615,11 +644,16 @@ class oTable extends oData
 
         $this->parseRequest();
 
+        $this->rearrangeColumns();
+
         //if no dataSet available..
             $this->prepareDBController();
-
-        $this->rearrangeColumns();
+        
         $this->rowController = new $this->oTableRowClassName($this->columns);
+
+        if($this->dataMode === self::DATA_MODE_TOTALS) {
+            return $this->exportTotals();
+        }
 
         switch ($this->exportType) {
             case ("sylk"):
