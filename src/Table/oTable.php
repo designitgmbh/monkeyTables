@@ -107,9 +107,7 @@ class oTable extends oData
         }
 
         $resultsPerPage = intval($this->request['resultsPerPage']);
-        if ($resultsPerPage > 100) {
-            $this->resultsPerPage = 100;
-        } elseif ($resultsPerPage > 0) {
+        if ($resultsPerPage > 0) {
             $this->resultsPerPage = $resultsPerPage;
         } else {
             $this->resultsPerPage = 20;
