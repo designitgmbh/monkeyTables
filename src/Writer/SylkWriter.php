@@ -114,6 +114,8 @@ class SylkWriter
         //html entities gives some issues when opening the file with Excel
         //we convert the entities again to their applicable characters
         $value = html_entity_decode($value);
+        //issues with semicolons while opening .slk files with Excel
+        $value = str_replace(";","",$value);
 
         switch ($this->columns[$columnIdx]) {
             case ("currency"):
