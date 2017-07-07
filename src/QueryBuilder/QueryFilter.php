@@ -13,6 +13,7 @@ class QueryFilter
 
     public function __construct($fieldName, $compare, $values, $queryColumn = null)
     {
+        $this->pdo = DB::getPdo();
         $this->fieldName = $fieldName;
         $this->compare = $compare;
         $this->values = $values;
@@ -114,6 +115,9 @@ class QueryFilter
         } elseif ($this->isDate($value)) {
             return DB::raw("'$value'");
         }
+
+        $value = $this->pdo->quote($value);
+        
         return DB::raw("LOWER('$value')");
     }
 
