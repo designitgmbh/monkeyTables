@@ -118,7 +118,7 @@ class QueryFilter
 
         $value = $this->pdo->quote($value);
         
-        return DB::raw("LOWER('$value')");
+        return DB::raw("LOWER($value)");
     }
 
     protected function isDate($value)
