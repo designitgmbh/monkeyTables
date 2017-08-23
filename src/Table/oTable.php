@@ -417,13 +417,13 @@ class oTable extends oData
             foreach ($this->columnArrangement as $key => $value) {
                 if (isset($columns[$value])) {
                     $columns[$value]->setChainNumber($value);
-                    array_push($this->columns, $columns[$value]);
+                    $this->columns[$value] = $columns[$value];
                     unset($columns[$value]);
                 }
             }
             foreach ($columns as $key => $column) {
                 $column->setChainNumber($key);
-                array_push($this->columns, $column);
+                $this->columns[$key] = $columns[$key];
             }
         } else {
             foreach ($this->columns as $key => $column) {
