@@ -33,17 +33,33 @@ class oData
          */
     protected $totalCountType = self::TOTAL_COUNT_TYPE_FULL;
 
+    /**
+     * The data mode
+     * This can be used to execute other functionality
+     *
+     * @var integer
+     */
+    protected $dataMode = self::DATA_MODE_FULL;
+
     const
-    TOTAL_COUNT_TYPE_NONE       = 0,
-    TOTAL_COUNT_TYPE_FULL       = 1,
-    TOTAL_COUNT_TYPE_NEXT_PAGE  = 2,
-    TOTAL_COUNT_TYPE_SHOW_ALL   = 3,
-    TOTAL_COUNT_TYPE_JSON       = [
-        'NONE'      => 0,
-        'FULL'      => 1,
-        'NEXT_PAGE' => 2,
-        'SHOW_ALL'  => 3,
-    ];
+        TOTAL_COUNT_TYPE_NONE       = 0,
+        TOTAL_COUNT_TYPE_FULL       = 1,
+        TOTAL_COUNT_TYPE_NEXT_PAGE  = 2,
+        TOTAL_COUNT_TYPE_SHOW_ALL   = 3,
+        TOTAL_COUNT_TYPE_JSON       = [
+            'NONE'      => 0,
+            'FULL'      => 1,
+            'NEXT_PAGE' => 2,
+            'SHOW_ALL'  => 3,
+        ];
+
+    const
+        DATA_MODE_FULL = 0,
+        DATA_MODE_TOTALS = 1,
+        DATA_MODE_JSON = [
+            'FULL' => 0,
+            'TOTALS' => 1
+        ];
 
     protected /**
              * Array of entities to that have to be prefetched
@@ -178,6 +194,16 @@ class oData
         $this->columnArrangement    = $columnArrangement;
         $this->hiddenColumns        = $hiddenColumns;
 
+        if(isset($this->request['dataMode'])) {
+            $dataMode = $this->request['dataMode'];
+
+            if(array_key_exists($dataMode, self::DATA_MODE_JSON)) {
+                $this->dataMode = self::DATA_MODE_JSON[$dataMode];
+            } else {
+                throw new \Exception("The provided data mode '{$dataMode}' is not supported by monkey-tables. Please use one of: [FULL, TOTALS]");
+            }
+        }
+
         if (isset($this->request['preset'])) {
             $this->presetHandler = new oDataPresetHandler($this->name, $this->request['preset']);
         } else {
@@ -256,7 +282,13 @@ class oData
             ->setTotalCountType($this->totalCountType)
             ->setSelect($this->select);
 
-        $this->dataSet      = $this->DBController->getRows($this->createFilters());
-        $this->rowsCount    = $this->DBController->getRowsCount();
+        $filters = $this->createFilters();
+
+        if($this->dataMode === self::DATA_MODE_FULL) {
+            $this->dataSet      = $this->DBController->getRows($filters);
+            $this->rowsCount    = $this->DBController->getRowsCount();
+        } else {
+            $this->dataSet = $this->DBController->calculateTotals($filters);
+        }
     }
 }

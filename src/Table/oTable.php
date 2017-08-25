@@ -258,7 +258,8 @@ class oTable extends oData
             ->createPaginationFilters($filters)
             ->createSortingFilters($filters)
             ->createFilteringFilters($filters)
-            ->createQuickSearchFilters($filters);
+            ->createQuickSearchFilters($filters)
+            ->createSumFilters($filters);;
             
         return $filters;
     }
@@ -369,6 +370,30 @@ class oTable extends oData
         return $this;
     }
 
+    protected function createSumFilters(&$filters) {
+        $sumArray = [];
+
+        foreach($this->columns as $column) {
+            if($column->getType() != 'number' && $column->getType() != 'currency') {
+                continue;
+            }
+
+            $valueKey = $column->getValueKey();
+            if(!$valueKey) {
+                continue;
+            }
+
+            $sumArray[] = [
+                "chainNumber" => $column->getChainNumber(),
+                "valueKey" => $valueKey
+            ];
+        }
+
+        $filters['sum'] = $sumArray;
+
+        return $this;
+    }
+
     private function rearrangeColumns()
     {
         //VISIBILITY
@@ -392,13 +417,13 @@ class oTable extends oData
             foreach ($this->columnArrangement as $key => $value) {
                 if (isset($columns[$value])) {
                     $columns[$value]->setChainNumber($value);
-                    array_push($this->columns, $columns[$value]);
+                    $this->columns[$value] = $columns[$value];
                     unset($columns[$value]);
                 }
             }
             foreach ($columns as $key => $column) {
                 $column->setChainNumber($key);
-                array_push($this->columns, $column);
+                $this->columns[$key] = $columns[$key];
             }
         } else {
             foreach ($this->columns as $key => $column) {
@@ -588,6 +613,10 @@ class oTable extends oData
         return $this->toArray();
     }
 
+    private function exportTotals() {
+        return $this->dataSet;
+    }
+
 
     // class functions //
     public function add($column)
@@ -615,11 +644,16 @@ class oTable extends oData
 
         $this->parseRequest();
 
+        $this->rearrangeColumns();
+
         //if no dataSet available..
             $this->prepareDBController();
-
-        $this->rearrangeColumns();
+        
         $this->rowController = new $this->oTableRowClassName($this->columns);
+
+        if($this->dataMode === self::DATA_MODE_TOTALS) {
+            return $this->exportTotals();
+        }
 
         switch ($this->exportType) {
             case ("sylk"):

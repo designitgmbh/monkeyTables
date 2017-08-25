@@ -18,7 +18,8 @@ class Query
         $join = [],
         $filter = [],
         $quickSearchFilter = [],
-        $groupBy = [];
+        $groupBy = [],
+        $sum = [];
 
     public static function fromTable($table)
     {
@@ -94,6 +95,26 @@ class Query
         }
 
         return $this;
+    }
+
+    public function sum($sumClause, $chainNumber)
+    {
+        $this->sum[$chainNumber] = $sumClause;
+
+        return $this;
+    }
+
+    private function doSum()
+    {
+        $totals = [];
+
+        if ($this->sum) {
+            foreach($this->sum as $chainNumber => $sum) {
+                $totals[$chainNumber] = $this->query->sum(DB::raw($sum));
+            }
+        }
+
+        return $totals;
     }
 
     private function doSelect()
@@ -285,8 +306,6 @@ class Query
 
     public function orderBy($fieldName, $direction)
     {
-        // dd($fieldName, $direction);
-
         $this->query->orderBy(
             DB::raw($fieldName),
             $direction
@@ -315,6 +334,15 @@ class Query
     {
         $this->queryClone = clone $this->query;
         return $this->queryClone;
+    }
+
+    public function totals()
+    {
+        $this->doSelect()
+            ->doJoin()
+            ->doFilter();
+
+        return $this->doSum();
     }
 
     public function count()
