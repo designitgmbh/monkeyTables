@@ -374,6 +374,11 @@ class oTable extends oData
         $sumArray = [];
 
         foreach($this->columns as $column) {
+
+            if (!$column->isEnabled()) {
+                continue;
+            }
+
             if($column->getType() != 'number' && $column->getType() != 'currency') {
                 continue;
             }
