@@ -110,7 +110,11 @@ class Query
 
         if ($this->sum) {
             foreach($this->sum as $chainNumber => $sum) {
-                $totals[$chainNumber] = $this->query->sum(DB::raw($sum));
+                $selectColumn = DB::raw($sum . " as totalSum");
+
+                $totals[$chainNumber] = DB::table(DB::raw("(" . $this->query->select($selectColumn)->toSql() . ") as sumSubQuery"))
+                    ->mergeBindings($this->query->getQuery())
+                    ->sum("totalSum");
             }
         }
 
@@ -340,7 +344,8 @@ class Query
     {
         $this->doSelect()
             ->doJoin()
-            ->doFilter();
+            ->doFilter()
+            ->doGroupBy();
 
         return $this->doSum();
     }
