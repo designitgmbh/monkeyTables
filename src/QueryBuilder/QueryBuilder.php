@@ -240,7 +240,6 @@ class QueryBuilder
                 $this->applyPrefilter($query);
             }
 
-            $query->take(100);
             $query->prepare();
             
             $result = $query->get();
