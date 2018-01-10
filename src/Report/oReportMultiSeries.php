@@ -90,45 +90,45 @@ class oReportMultiSeries extends oReportSeries
             case ("DATE_BUSINESS_YEAR"):
                 $this->squashSelect = DB::raw(
                     "CONCAT(
-							'BY ',
-							IF(
-								MONTH(FROM_UNIXTIME( $squashField )) > 3, 
-								YEAR(FROM_UNIXTIME( $squashField )) + 1, 
-								YEAR(FROM_UNIXTIME( $squashField ))
-							)
-						) as $xAxisName"
+                            'BY ',
+                            IF(
+                                MONTH(FROM_UNIXTIME( $squashField )) > 3, 
+                                YEAR(FROM_UNIXTIME( $squashField )) + 1, 
+                                YEAR(FROM_UNIXTIME( $squashField ))
+                            )
+                        ) as $xAxisName"
                 );
                 break;
 
             case ("DATE_MONTH"):
                 $this->squashSelect = DB::raw(
                     "CONCAT(
-							DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'), 
-							'.', 
-							YEAR(FROM_UNIXTIME( $squashField ))
-						) as $xAxisName"
+                            DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'), 
+                            '.', 
+                            YEAR(FROM_UNIXTIME( $squashField ))
+                        ) as $xAxisName"
                 );
                 break;
 
             case ("DATE_DAY"):
                 $this->squashSelect = DB::raw(
                     "CONCAT(
-							DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%d'),
-							'.',
-							DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'),
-							'.',
-							YEAR(FROM_UNIXTIME( $squashField ))
-						) as $xAxisName"
+                            DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%d'),
+                            '.',
+                            DATE_FORMAT(FROM_UNIXTIME( $squashField ),'%m'),
+                            '.',
+                            YEAR(FROM_UNIXTIME( $squashField ))
+                        ) as $xAxisName"
                 );
                 break;
                 
             case ("DATE_WEEKDAY"):
                 $this->squashSelect = DB::raw(
                     "CONCAT(
-							WEEK( FROM_UNIXTIME( $squashField ) ),
-							'/',
-							YEAR(FROM_UNIXTIME( $squashField ))
-						) as $xAxisName"
+                            WEEK( FROM_UNIXTIME( $squashField ) ),
+                            '/',
+                            YEAR(FROM_UNIXTIME( $squashField ))
+                        ) as $xAxisName"
                 );
                 break;
 
@@ -200,21 +200,21 @@ class oReportMultiSeries extends oReportSeries
 
             case ("DATE_MONTH"):
                 //limit to 24 months
-                if ($diff->format('%y') >= 2 && $diff->format('%m') >= 1) {
+                if ($diff->format('%y') >= 2) {
                     $from = $to->sub(new \DateInterval('P2Y'));
                 }
 
                 break;
 
             case ("DATE_DAY"):
-                if ($diff->format('%y') >= 1 && $diff->format('%m') >= 1) {
+                if ($diff->format('%y') >= 2) {
                     $from = $to->sub(new \DateInterval('P7D'));
                 }
 
                 break;
 
             case ("DATE_WEEKDAY"):
-                if ($diff->format('%y') >= 1 && $diff->format('%m') >= 3) {
+                if ($diff->format('%y') >= 2) {
                     $from = $to->sub(new \DateInterval('P1M'));
                 }
 
