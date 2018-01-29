@@ -6,7 +6,7 @@
         "monkeyTables"
     ],
     "homepage": "https://github.com/designitgmbh/monkeyTables",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Philipp Pajak",
