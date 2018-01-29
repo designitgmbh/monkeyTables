@@ -125,7 +125,7 @@ class oReportMultiSeries extends oReportSeries
             case ("DATE_WEEKDAY"):
                 $this->squashSelect = DB::raw(
                     "CONCAT(
-                            WEEK( FROM_UNIXTIME( $squashField ) ),
+                            WEEK( FROM_UNIXTIME( $squashField ), 3 ),
                             '/',
                             YEAR(FROM_UNIXTIME( $squashField ))
                         ) as $xAxisName"
