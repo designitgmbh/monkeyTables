@@ -128,6 +128,12 @@ class SylkWriter
                 break;
             case ("date"):
             case ("timeline"):
+
+                //If the date is already formatted then we don't do anything
+                if (preg_match("![\.-]+!i", $value)) {
+                    return '"' . $value . '"';
+                }
+                
                 //... divide by 86400 + 25569
                 //as suggested by wikipedia to
                 //convert unix timestamp into
