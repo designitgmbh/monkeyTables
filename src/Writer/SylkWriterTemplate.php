@@ -33,7 +33,7 @@ P;P0.00E+00
 P;P##0.0E+0
 P;P#\ ?/?
 P;P#\ ??/??
-P;Pdd/mm/yyyy
+P;Pd/m/yyyy
 P;Pd\-mmm\-yy
 P;Pd\-mmm
 P;Pmmm\-yy
@@ -41,7 +41,7 @@ P;Ph:mm\ AM/PM
 P;Ph:mm:ss\ AM/PM
 P;Ph:mm
 P;Ph:mm:ss
-P;Pdd/mm/yyyy\ h:mm
+P;Pd/m/yyyy\ h:mm
 P;Pmm:ss
 P;Pmm:ss.0
 P;P@
