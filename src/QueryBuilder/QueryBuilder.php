@@ -241,6 +241,8 @@ class QueryBuilder
             }
 
             $query->prepare();
+
+            $query->take(100);
             
             $result = $query->get();
 
