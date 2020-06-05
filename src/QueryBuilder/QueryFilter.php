@@ -17,7 +17,7 @@ class QueryFilter
         $this->fieldName = $fieldName;
         $this->compare = $compare;
         $this->values = $values;
-        
+
         $this->needsHaving = $queryColumn ? $queryColumn->needsHaving() : false;
     }
 
@@ -106,7 +106,7 @@ class QueryFilter
         return $compares;
     }
 
-    protected function transformValueForFiter($value)
+    protected function transformValueForFilter($value)
     {
         if (is_numeric($value)) {
             return DB::raw("$value");
@@ -117,7 +117,7 @@ class QueryFilter
         }
 
         $value = $this->pdo->quote($value);
-        
+
         return DB::raw("LOWER($value)");
     }
 
@@ -141,7 +141,7 @@ class QueryFilter
                         ? DB::raw("{$this->fieldName}")
                         : DB::raw("LOWER(" . $this->fieldName . ")"),
                     $compare->compare,
-                    $this->transformValueForFiter($compare->value)
+                    $this->transformValueForFilter($compare->value)
                 );
             }
         });
@@ -150,6 +150,6 @@ class QueryFilter
     protected function filteringHavingComparison($query, $value)
     {
         return "( LOWER(" . $this->fieldName . ") " . $this->compare . " " .
-            $this->transformValueForFiter($value) . ")";
+            $this->transformValueForFilter($value) . ")";
     }
 }
