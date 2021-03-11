@@ -118,7 +118,8 @@ class QueryFilter
 
         $value = $this->pdo->quote($value);
 
-        return DB::raw("LOWER($value)");
+        // hack to be able to compare regardless of the table collation
+        return DB::raw("LOWER($value) COLLATE utf8mb4_unicode_ci");
     }
 
     protected function isDate($value)
