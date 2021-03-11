@@ -65,6 +65,21 @@ class oTableColumn extends oDataChain
 
         return $this;
     }
+    
+    public function setPhoneClickable()
+    {
+        $this->href = "TEL://{{value}}";
+        $this->linkValueKey = $this->valueKey;
+        $this->linkValueCallback = function ($val) {
+            if (!empty($val)) {
+                $this->class = "h-clickable-phone";
+                return "TEL://" . str_replace([' ', '-'], '', $val);
+            }
+            $this->class = "";
+            return null;
+        };
+        return $this;
+    }
 
     public function setEditable($route = null, $attribute = null, $argument = 'id')
     {
